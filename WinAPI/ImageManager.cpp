@@ -157,6 +157,22 @@ void ImageManager::Init()
 	//Render to hdc
 	//create DCRenderTarget
 	//props = option to create DC Render Target
+	D2D1_BITMAP_PROPERTIES1 layerBitmapProperties =
+		D2D1::BitmapProperties1
+		(
+			D2D1_BITMAP_OPTIONS_TARGET| D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
+			dpiX,
+			dpiY
+		);
+	D2D1_BITMAP_PROPERTIES1 basiclayerBitmapProperties =
+		D2D1::BitmapProperties1
+		(
+			D2D1_BITMAP_OPTIONS_TARGET| D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
+			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),
+			dpiX,
+			dpiY
+		);
 	D2D1_RENDER_TARGET_PROPERTIES props = D2D1::RenderTargetProperties(
 		D2D1_RENDER_TARGET_TYPE_DEFAULT,
 		D2D1::PixelFormat(
@@ -168,16 +184,10 @@ void ImageManager::Init()
 		D2D1_FEATURE_LEVEL_DEFAULT
 	);
 
-	D2D1_MATRIX_3X2_F matT, matR, matS;
-	matT = D2D1::Matrix3x2F::Translation(0, 0);
-	matR = D2D1::Matrix3x2F::Rotation(NULL);
-	matS = D2D1::Matrix3x2F::Scale(D2D1::SizeF(1, 1));
-
-	m_trsDefault = matS * matR * matT;
-
+		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &basiclayerBitmapProperties, &m_layerEmpty);
 	for (int i = 0; i < eLayerNumCount; i++)
 	{
-		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &bitmapProperties, &m_layer[i]);
+		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &layerBitmapProperties, &m_layer[i]);
 	}
 
 
@@ -383,8 +393,7 @@ CImage* ImageManager::AddTileLayerImage(map<int, eTileSheetKey> tileFirstgrid, v
 		}//end for column
 	}//end for low
 
-	//·»´õÅ¸°Ù ´Ù½Ã ¹é¹öÆÛ·Î
-	ResetTRS();
+	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
 
 	CImage* img = new CImage(bitmap, imageWidth, imageHeight);
 	return img;
@@ -505,6 +514,18 @@ void ImageManager::DrawColorRender(CImage* img, float x, float y, float sizeX, f
 	}
 }
 
+void ImageManager::Begin()
+{
+	m_d2dContext->BeginDraw();
+	for (int i = 0; i < eLayerNumCount; i++)
+	{
+		//m_layer[i]->CopyFromBitmap(&D2D1::Point2U(0, 0), m_layerEmpty, &D2D1::RectU(0, 0, WINSIZE_X, WINSIZE_Y));
+		//m_d2dContext->SetTarget(m_layer[i]);
+		//D2D1_COLOR_F a = D2D1::ColorF::Black;
+	//	m_d2dContext->Clear();
+	}
+}
+
 void ImageManager::BitmapRenderUseMatrix(ID2D1Bitmap* bitmap, D2D1_MATRIX_3X2_F matrix, float alpha)
 {
 	m_d2dContext->SetTransform(matrix);
@@ -620,8 +641,8 @@ void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float rende
 		matS = D2D1::Matrix3x2F::Scale(CAMERA->GetScale(), CAMERA->GetScale()/*, { fW,fH }*/);
 	}
 	m_d2dContext->SetTransform((matS * matR * matT));
-	m_d2dContext->SetTarget(m_layer[layer]);
-
+	HRESULT hr = S_OK;
+	m_d2dContext->SetTarget(m_layer[/*layer*/eLayerTop]);
 	m_d2dContext->DrawBitmap
 	(
 		img->GetBitMap(),
@@ -671,7 +692,7 @@ void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, 
 	else if (frameY > img->GetMaxFrameY()) frameY = img->GetMaxFrameY();
 
 	m_d2dContext->SetTransform(matS * matR * matT);
-	m_d2dContext->SetTarget(m_layer[layer]);
+	m_d2dContext->SetTarget(m_layer[/*layer*/eLayerTop]);
 
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
 		D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()),

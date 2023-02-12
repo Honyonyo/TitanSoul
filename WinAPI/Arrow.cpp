@@ -56,27 +56,31 @@ void Arrow::Update()
 };
 void Arrow::Render()
 {
+	eLayer layer;
+	if (m_direction == eLeftUp || m_direction == eUp || m_direction == eRightUp)
+		layer = eLayerUnderPlayer;
+	else layer = eLayerUpperPlayer;
 	//활시위 당길때
 	if (m_isDrawed)
 	{
-		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, m_rot);
+		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,m_rot);
 	}
 	//활시위 안당길 때 (분기 쏘았는가 아닌가로 나뉨)
 	else
 	{
 		if (m_isShotted)
 		{
-			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, m_rot);
+			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer, m_rot);
 		}
 		else
 		{
-			IMAGEMANAGER->CenterAniRender(m_image, m_playerCenter->x, m_playerCenter->y, m_playerAnimation);
+			IMAGEMANAGER->CenterAniRender(m_image, m_playerCenter->x, m_playerCenter->y, m_playerAnimation, layer);
 		}
 	}
 
 	if (m_isOnPickupAni)
 	{
-		IMAGEMANAGER->CenterAniRender(m_image, m_pickupPoint.x, m_pickupPoint.y, m_animation);
+		IMAGEMANAGER->CenterAniRender(m_image, m_pickupPoint.x, m_pickupPoint.y, m_animation, layer);
 	}
 };
 void Arrow::Release()

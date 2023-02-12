@@ -27,10 +27,9 @@ void MainGame::Update(void)
 void MainGame::Render(void)
 {
 	IMAGEMANAGER->Begin();	
-
 	SCENEMANAGER->Render();
 	OBJECTMANAGER->Render();
+	IMAGEMANAGER->Render();
 	TIMEMANAGER->Render();
 	IMAGEMANAGER->End();
-
 }

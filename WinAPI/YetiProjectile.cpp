@@ -34,19 +34,19 @@ void Icicle::Render()
 	 // 배경 - 그림자 - 플레이어아래 - 플레이어위 - 벽
 	 //
 	 //
-
+	eLayer layer = (m_center.y > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
 
 	if (m_imageChange)
 	{
-		IMAGEMANAGER->CenterFrameRender(m_img, m_center.x, m_center.y, 1, 2, 1, 0, 0.5);
-		IMAGEMANAGER->CenterFrameRender(m_img, m_imageCenter.x, m_imageCenter.y, m_imgNum, 1, 1);
+		IMAGEMANAGER->CenterFrameRender(m_img, m_center.x, m_center.y, 1, 2, eLayerShadow, 1, 0, 0.5);
+		IMAGEMANAGER->CenterFrameRender(m_img, m_imageCenter.x, m_imageCenter.y, m_imgNum, 1, layer);
 	}
 	else
 	{
 
-		IMAGEMANAGER->CenterFrameRender(m_img, m_center.x, m_center.y, 1, 2,
+		IMAGEMANAGER->CenterFrameRender(m_img, m_center.x, m_center.y, 1, 2, eLayerShadow,
 			m_shadowScale, 0, 0.5);
-		IMAGEMANAGER->CenterFrameRender(m_img, m_imageCenter.x, m_imageCenter.y, m_imgNum, 0, 1);
+		IMAGEMANAGER->CenterFrameRender(m_img, m_imageCenter.x, m_imageCenter.y, m_imgNum, 0,layer);
 	}
 }
 

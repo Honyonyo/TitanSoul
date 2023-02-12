@@ -124,8 +124,8 @@ void Player::Render()
 	//±×¸²ÀÚ ·»´õ
 	//IMAGEMANAGER->CenterFrameRender(m_Image, );
 
-	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation);
-	IMAGEMANAGER->CenterAniRender(m_bowImage, m_center.x, m_center.y, m_animation);
+	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation, eLayerTop);
+	IMAGEMANAGER->CenterAniRender(m_bowImage, m_center.x, m_center.y, m_animation, eLayerPlayer);
 };
 void Player::Release()
 {

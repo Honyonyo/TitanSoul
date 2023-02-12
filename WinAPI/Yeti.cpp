@@ -116,7 +116,7 @@ void Yeti::Update()
 		m_action = eDeath;
 	}
 
-	if (prevAction != m_action || prevDirection != m_direction &&m_action!=eRolling)
+	if (prevAction != m_action || prevDirection != m_direction && m_action != eRolling)
 	{
 		m_animation->SetPlayFrame(m_aniIndexArr[m_direction][m_action], false, 0);
 		m_animation->AniStart();
@@ -132,16 +132,17 @@ void Yeti::Update()
 
 void Yeti::Render()
 {
+	eLayer layer = (m_center.y > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
 	if (m_hitWall)
 	{
 
 	}
-	else { IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, 0.75f, 0, 0.5); }
+	else { IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f, 0, 0.5); }
 	if (m_direction == eLeft || m_direction == eLeftDown || m_direction == eLeftUp)
 	{
-		IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, true);
+		IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer, true);
 	}
-	else { IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation); }
+	else { IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer); }
 }
 
 void Yeti::Release()
@@ -152,11 +153,11 @@ void Yeti::Attack(eObjectKinds kinds)
 {
 	switch (kinds)
 	{
-		case ePlayer : 
-			cout << "예티 플레이어와 충돌" << endl;
-			break;
-		default:
-			NULL;
+	case ePlayer:
+		cout << "예티 플레이어와 충돌" << endl;
+		break;
+	default:
+		NULL;
 	}
 }
 
@@ -228,7 +229,7 @@ void Yeti::Rolling()
 	int nowFrameIndex = m_animation->GetNowFrameIdx();
 	if (!m_isOnRollingLoop && !m_hitWall)
 	{
-		if (nowFrameIndex ==6)
+		if (nowFrameIndex == 6)
 		{
 			m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRollingLoop], true, nowFrameIndex - 6);
 			m_animation->SetFPS(7);
@@ -318,8 +319,8 @@ void Yeti::Rolling()
 		{
 
 			m_center.x += m_rollingJumpMoveX * DELTA_TIME;
-			m_center.y += (m_rollingJumpMoveY-m_rollingJumpSpeed) * DELTA_TIME;
-			m_rollingJumpSpeed -= m_rollingGravity*DELTA_TIME;
+			m_center.y += (m_rollingJumpMoveY - m_rollingJumpSpeed) * DELTA_TIME;
+			m_rollingJumpSpeed -= m_rollingGravity * DELTA_TIME;
 
 			//(점프로 구현하면 되겠다)
 			//center점이 착지목표점까지의 직선을 기준으로 점프로 떠있음
@@ -329,13 +330,13 @@ void Yeti::Rolling()
 			if (MY_UTIL::getDistance(m_center.x, m_center.y, m_rollingDest.x, m_rollingDest.y) < 3)
 			{
 				m_center = m_rollingDest;
-			m_isOnAttack = true;
-			m_hitWall = false;
-			m_isOnRollingLoop = false;
-			m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
-			m_animation->AniResume();
+				m_isOnAttack = true;
+				m_hitWall = false;
+				m_isOnRollingLoop = false;
+				m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
+				m_animation->AniResume();
 			}
-			m_shadowCenter.x += m_rollingJumpMoveX * DELTA_TIME; 
+			m_shadowCenter.x += m_rollingJumpMoveX * DELTA_TIME;
 			m_shadowCenter.y += m_rollingJumpMoveY * DELTA_TIME;
 		}
 		else//일반적인 구르기
@@ -352,8 +353,36 @@ void Yeti::IcicleDrop()
 	//고드름간 최대거리 : 2고드름
 	//고드름간 최소거리 : 1고드름
 	//중심선 기준 편차 : 1고드름
+	D2D1_POINT_2F playerpoint = PLAYER->GetPointF();
+	float slop;
+	float tmp =2;
+	//if (playerpoint.x - m_center.x <TILE_SIZE)
+	//{
+		slop = (m_center.x>playerpoint.x)?-tanf(m_rotRad):tanf(m_rotRad);
+	//}
+	//else
+	//{
+	//	slop = (m_center.x > playerpoint.x) ? -(m_center.y- playerpoint.y) / (m_center.x- playerpoint.x) : (m_center.y - playerpoint.y) / (m_center.x - playerpoint.x);
+	//	tmp = (slop > 0) ? 2 : -2;
+	//}
+	int i = 1;
+	POINT dropCenter = { 8 + (m_center.x) / TILE_SIZE * TILE_SIZE, 8 + (m_center.y/ TILE_SIZE)*TILE_SIZE };
+	while (i<10)
+	{
+		
+		dropCenter.x += tmp*TILE_SIZE;
+		dropCenter.y += slop * TILE_SIZE * 2;
+		if (SCENEMANAGER->GetCurrentScenePixel()[dropCenter.x][dropCenter.y] != RGB(0,0,0))
+		{
+		//	break;
+		}
+	//	else 
+		{
+			OBJECTMANAGER->AddObject<Icicle>()->Setting(dropCenter.x, dropCenter.y, 1);
+			i++;
+		}
 
-	OBJECTMANAGER->AddObject<Icicle>()->Setting(PLAYER->GetPoint().x, PLAYER->GetPoint().y, 1);
+	}
 
 }
 void Yeti::Ready(int prevFrame)

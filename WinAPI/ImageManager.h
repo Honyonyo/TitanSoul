@@ -49,6 +49,7 @@ private:
 	std::map <string, CImage*> m_imageList;
 	CImage* m_tileImageList[eTileSheetKey::tileCount];
 	ID2D1Bitmap1* m_layer[eLayerNumCount];
+	ID2D1Bitmap1* m_layerEmpty;
 
 	GImage* m_spectiles;
 	bool isShake;
@@ -110,9 +111,9 @@ public:
 	void CropRender(CImage* img, float x, float y, RECT cropRc, bool isReversed = false, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void SampleRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void CenterRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
-	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer = eLayerPlayer, bool isReversed = false,  float rot = 0, float alpha = 1);
+	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed = false,  float rot = 0, float alpha = 1);
 	void FrameRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
-	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer = eLayerPlayer,float scale = 1, float rot = 0, float alpha = 1);
+	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer,float scale = 1, float rot = 0, float alpha = 1);
 
 	void TileRender(eTileSheetKey key, int tileNumber, int low, int column, int tileLineMaxNumber = 64);
 
@@ -151,16 +152,22 @@ public:
 		m_trsDefault.dy = 0;
 		m_d2dContext->SetTransform(m_trsDefault);
 	}
-	void Begin() { m_d2dContext->BeginDraw(); }
+	void Begin();
 	void End()
 	{
-		m_d2dContext->EndDraw();
+		HRESULT hr = S_OK;
+		hr = m_d2dContext->EndDraw();
 		DXGI_PRESENT_PARAMETERS parameters = { 0 };
 		//parameters.DirtyRectsCount = 0;
 		//parameters.pDirtyRects = nullptr;
 		//parameters.pScrollRect = nullptr;
 		//parameters.pScrollOffset = nullptr;
 		/*hr =*/DXGISwapChain->Present1(1, 0, &parameters);
+
+		if (hr != S_OK)
+		{
+			cout << "엔드드로우 에러코드 " << hr << endl;
+		}
 	}
 
 	void SetViewCollision(bool isView) { m_isViewCollision = isView; }
