@@ -1,0 +1,292 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="API FrameWork">
+      <UniqueIdentifier>{927d90d9-3762-4867-af17-086f78a8e8a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\Utility">
+      <UniqueIdentifier>{7bf44066-0b25-450d-b977-0868f0524191}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\Utility\Math">
+      <UniqueIdentifier>{239551d2-d908-4313-a47d-bedc0a4bb4bb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\PCH">
+      <UniqueIdentifier>{429ea63c-e6ae-48f4-8943-147708820431}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\DesignPattern">
+      <UniqueIdentifier>{f144cbf2-7bcf-44e2-a2e2-02ffd3f582d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\GameCore">
+      <UniqueIdentifier>{75617e6e-9aeb-4f50-a4e9-4e578e1f53e1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MainGame">
+      <UniqueIdentifier>{18ee7c09-1b00-47c3-890a-ada2cf7c7038}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\Manager">
+      <UniqueIdentifier>{b6236ff0-ee44-4d31-9a01-4a3d777bbf3c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="API FrameWork\Image">
+      <UniqueIdentifier>{9e73a969-f93b-4a52-8a42-41f812e5d88e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="MapTool">
+      <UniqueIdentifier>{9080a4b9-9784-4b4c-a68e-0ea36be51267}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene">
+      <UniqueIdentifier>{d6d5be81-bf66-4a51-a901-6268b562dc33}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\json">
+      <UniqueIdentifier>{72973d83-e0c5-453a-8418-6ff04346cb80}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Field">
+      <UniqueIdentifier>{8218df68-5489-403d-96e2-5021135eb910}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Scene\Field\FrostMountains">
+      <UniqueIdentifier>{db2caec5-20e5-41cb-b9ad-58fa5b4d841f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object">
+      <UniqueIdentifier>{0e86830e-e7c1-4bda-9e57-89e9187a1716}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Player">
+      <UniqueIdentifier>{a1747fbc-c5da-4772-9ee1-5f2c92cb63cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Boss">
+      <UniqueIdentifier>{82da3cee-062b-4a57-bd0a-c2c74c420df4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Boss\Yeti">
+      <UniqueIdentifier>{f2b35a60-b4cc-4a38-a1db-ffabc4ded449}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="C3DMatrix.cpp">
+      <Filter>API FrameWork\Utility\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="C3DVector.cpp">
+      <Filter>API FrameWork\Utility\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="stdafx.cpp">
+      <Filter>API FrameWork\PCH</Filter>
+    </ClCompile>
+    <ClCompile Include="GameNode.cpp">
+      <Filter>API FrameWork\GameCore</Filter>
+    </ClCompile>
+    <ClCompile Include="IWindowMessage.cpp">
+      <Filter>API FrameWork\GameCore</Filter>
+    </ClCompile>
+    <ClCompile Include="KeyManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Utils.cpp">
+      <Filter>API FrameWork\Utility</Filter>
+    </ClCompile>
+    <ClCompile Include="WinMain.cpp" />
+    <ClCompile Include="MainGame.cpp">
+      <Filter>MainGame</Filter>
+    </ClCompile>
+    <ClCompile Include="Timer.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="TimeManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SceneManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="SoundManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="JsonSaveLoader.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="MapToolScene.cpp">
+      <Filter>MapTool</Filter>
+    </ClCompile>
+    <ClCompile Include="SludgeheartScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="StaticEnumMethod.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Scene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
+    <ClCompile Include="FrostMountains.cpp">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClCompile>
+    <ClCompile Include="YetiScene.cpp">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClCompile>
+    <ClCompile Include="CImage.cpp">
+      <Filter>API FrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="TextManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Camera.cpp">
+      <Filter>API FrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="GImage.cpp">
+      <Filter>API FrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="Player.cpp">
+      <Filter>Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="ObjectManager.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+    <ClCompile Include="Boss.cpp">
+      <Filter>Object\Boss</Filter>
+    </ClCompile>
+    <ClCompile Include="Arrow.cpp">
+      <Filter>Object\Player</Filter>
+    </ClCompile>
+    <ClCompile Include="Object.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Animation.cpp">
+      <Filter>API FrameWork\Image</Filter>
+    </ClCompile>
+    <ClCompile Include="PixelCollision.cpp">
+      <Filter>Object</Filter>
+    </ClCompile>
+    <ClCompile Include="Yeti.cpp">
+      <Filter>Object\Boss\Yeti</Filter>
+    </ClCompile>
+    <ClCompile Include="YetiProjectile.cpp">
+      <Filter>Object\Boss\Yeti</Filter>
+    </ClCompile>
+    <ClCompile Include="GameData.cpp">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="C3DMatrix.h">
+      <Filter>API FrameWork\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="C3DVector.h">
+      <Filter>API FrameWork\Utility\Math</Filter>
+    </ClInclude>
+    <ClInclude Include="stdafx.h">
+      <Filter>API FrameWork\PCH</Filter>
+    </ClInclude>
+    <ClInclude Include="GameNode.h">
+      <Filter>API FrameWork\GameCore</Filter>
+    </ClInclude>
+    <ClInclude Include="IWindowMessage.h">
+      <Filter>API FrameWork\GameCore</Filter>
+    </ClInclude>
+    <ClInclude Include="CommonMacroFunction.h">
+      <Filter>API FrameWork\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="RandomFunction.h">
+      <Filter>API FrameWork\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="KeyManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Utils.h">
+      <Filter>API FrameWork\Utility</Filter>
+    </ClInclude>
+    <ClInclude Include="MainGame.h">
+      <Filter>MainGame</Filter>
+    </ClInclude>
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="Timer.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="TimeManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SceneManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SingletonBase.h">
+      <Filter>API FrameWork\DesignPattern</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="SoundManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="JsonSaveLoader.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="MapToolScene.h">
+      <Filter>MapTool</Filter>
+    </ClInclude>
+    <ClInclude Include="SludgeheartScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Scene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="FrostMountains.h">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClInclude>
+    <ClInclude Include="YetiScene.h">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClInclude>
+    <ClInclude Include="CImage.h">
+      <Filter>API FrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="TextManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.h">
+      <Filter>API FrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="GImage.h">
+      <Filter>API FrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.h">
+      <Filter>Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="ObjectManager.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="Boss.h">
+      <Filter>Object\Boss</Filter>
+    </ClInclude>
+    <ClInclude Include="Arrow.h">
+      <Filter>Object\Player</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Animation.h">
+      <Filter>API FrameWork\Image</Filter>
+    </ClInclude>
+    <ClInclude Include="PixelCollision.h">
+      <Filter>Object</Filter>
+    </ClInclude>
+    <ClInclude Include="Yeti.h">
+      <Filter>Object\Boss\Yeti</Filter>
+    </ClInclude>
+    <ClInclude Include="YetiProjectile.h">
+      <Filter>Object\Boss\Yeti</Filter>
+    </ClInclude>
+    <ClInclude Include="GameData.h">
+      <Filter>API FrameWork\Manager</Filter>
+    </ClInclude>
+    <ClInclude Include="enumList.h">
+      <Filter>API FrameWork\PCH</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WinAPI.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="MapSchema.json">
+      <Filter>Scene\json</Filter>
+    </None>
+    <None Include="YetiMap.json">
+      <Filter>Scene\json</Filter>
+    </None>
+    <None Include="SlugeheartMap.json">
+      <Filter>Scene\json</Filter>
+    </None>
+  </ItemGroup>
+</Project>

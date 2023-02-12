@@ -1,0 +1,24 @@
+{
+  "title": "맵 스키마",
+  "description": "이 스키마는 맵에 관한 데이터를 검증하기 위해 작성됨.",
+
+
+  "Tile": [
+    {
+      "layerName": { "type": "string" },
+      "tileSheet": {
+        "type": "array",
+        "items": {
+          "key": { "type": "string" },
+          "firstGrid": { "type": "integer" }
+        }
+      },
+      "tileWidth": { "type": "integer" },
+      "tileHeight": { "type": "integer" },
+      "tileCode": {
+        "type": "array",
+        "items": { "type": "integer" }
+      }
+    }
+  ]
+}
