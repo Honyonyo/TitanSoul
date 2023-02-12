@@ -30,6 +30,8 @@ protected:
 	vector<tagTile*> m_tileLayerVector;
 	vector<tagTile*>::iterator m_iterTileLayerVector;
 	GImage* m_collLayer = nullptr;
+	float m_mapsizeX;
+	float m_mapsizeY;
 
 	bool isLoaded;	//생성자에서 false로 초기화, Init되면 true로 변경
 
@@ -56,7 +58,7 @@ public:
 			cout << "맵에 타일 아직 안들어감. 사이즈 호출 실패" << endl;
 			return NULL;
 		}
-		return this->m_tileLayerVector[0]->layerImage->GetWidth();
+		return this->m_mapsizeX;
 	}
 	virtual float GetMapHeight()
 	{
@@ -65,10 +67,10 @@ public:
 			cout << "맵에 타일 아직 안들어감. 사이즈 호출 실패" << endl;
 			return NULL;
 		}
-		return this->m_tileLayerVector[0]->layerImage->GetHeight();
+		return this->m_mapsizeY;
 	};
 
-	Scene() : isLoaded(false) {}
+	Scene() : isLoaded(false), m_mapsizeX(NULL), m_mapsizeY(NULL) {}
 	virtual ~Scene() 
 	{
 		if (m_collLayer != nullptr)

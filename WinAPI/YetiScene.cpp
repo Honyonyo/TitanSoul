@@ -43,7 +43,7 @@ void YetiScene::Render(void)
 		switch ((*m_iterTileLayerVector)->layerType)
 		{
 		case eBG:	//¹Ù´Ú ·»´õ
-			IMAGEMANAGER->Render((*m_iterTileLayerVector)->layerImage, 0, 0);
+			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX/2, m_mapsizeY/2, 0, 0);
 			break;
 		case eFG:	//º® ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F1))

@@ -27,6 +27,19 @@ static const enum eTileLayerType
 	eMAT,
 	eTileLayerTypeCount
 };
+
+static const enum eLayer
+{
+	eLayerBg = 0,
+	eLayerShadow,
+	eLayerUnderPlayer,
+	eLayerPlayer,
+	eLayerUpperPlayer,
+	eLayerWall,
+	eLayerTop,
+
+	eLayerNumCount
+};
 static map<string, eTileLayerType> layerTypeTable;
 
 class Animation;
@@ -35,6 +48,8 @@ class ImageManager : public SingletonBase<ImageManager>
 private:
 	std::map <string, CImage*> m_imageList;
 	CImage* m_tileImageList[eTileSheetKey::tileCount];
+	ID2D1Bitmap1* m_layer[eLayerNumCount];
+
 	GImage* m_spectiles;
 	bool isShake;
 	RECT m_screenRect;
@@ -85,6 +100,7 @@ public:
 	~ImageManager();
 public:
 	void Init();
+	void Render();
 
 	void BitmapRenderUseMatrix(ID2D1Bitmap* bitmap, D2D1_MATRIX_3X2_F matrix, float alpha);
 	void BitmapRenderToDCUseMatrix(ID2D1Bitmap* bitmap, D2D1_MATRIX_3X2_F matrix);
@@ -94,9 +110,9 @@ public:
 	void CropRender(CImage* img, float x, float y, RECT cropRc, bool isReversed = false, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void SampleRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void CenterRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
-	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, bool isReversed = false,  float rot = 0, float alpha = 1);
+	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer = eLayerPlayer, bool isReversed = false,  float rot = 0, float alpha = 1);
 	void FrameRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
-	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY,float scale, float rot = 0, float alpha = 1);
+	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer = eLayerPlayer,float scale = 1, float rot = 0, float alpha = 1);
 
 	void TileRender(eTileSheetKey key, int tileNumber, int low, int column, int tileLineMaxNumber = 64);
 

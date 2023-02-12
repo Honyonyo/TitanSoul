@@ -175,7 +175,23 @@ void ImageManager::Init()
 
 	m_trsDefault = matS * matR * matT;
 
+	for (int i = 0; i < eLayerNumCount; i++)
+	{
+		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &bitmapProperties, &m_layer[i]);
+	}
+
+
 	ImageLoad();
+}
+
+void ImageManager::Render()
+{
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
+
+	for (int i = 0; i < eLayerNumCount; i++)
+	{
+		m_d2dContext->DrawBitmap(m_layer[i]);
+	}
 }
 
 void ImageManager::BindD2DtoDC(HDC memDC)
@@ -584,7 +600,7 @@ void ImageManager::CenterRender(CImage* img, float x, float y, float sizeX, floa
 	color->Release();
 }
 
-void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, bool isReversed,float rot, float alpha)
+void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed,float rot, float alpha)
 {
 	float fW = ani->GetFrameWidth() * 0.5f;
 	float fH = ani->GetFrameHeight() * 0.5f;
@@ -602,7 +618,10 @@ void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float rende
 		matT = D2D1::Matrix3x2F::Translation(((renderTargetX - fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((renderTargetY - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
 		matR = D2D1::Matrix3x2F::Rotation(rot, { 0 ,0 });
 		matS = D2D1::Matrix3x2F::Scale(CAMERA->GetScale(), CAMERA->GetScale()/*, { fW,fH }*/);
-	}m_d2dContext->SetTransform((matS * matR * matT));
+	}
+	m_d2dContext->SetTransform((matS * matR * matT));
+	m_d2dContext->SetTarget(m_layer[layer]);
+
 	m_d2dContext->DrawBitmap
 	(
 		img->GetBitMap(),
@@ -613,6 +632,7 @@ void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float rende
 	if (KEYMANAGER->isToggleKey(VK_F7))
 		m_d2dContext->DrawRectangle(D2D1::RectF(0, 0, fW * 2, fH * 2), m_brush);
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
 }
 void ImageManager::FrameRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
 {
@@ -639,7 +659,7 @@ void ImageManager::FrameRender(CImage* img, float x, float y, int frameX, int fr
 	color->SetOpacity(alpha);
 }
 
-void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, float scale, float rot, float alpha)
+void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, float scale, float rot, float alpha)
 {
 	D2D1_MATRIX_3X2_F matT, matR, matS;
 	matT = D2D1::Matrix3x2F::Translation(((x - img->GetFrameWidth() * 0.5f) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((y - img->GetFrameHeight() * 0.5f) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
@@ -651,6 +671,7 @@ void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, 
 	else if (frameY > img->GetMaxFrameY()) frameY = img->GetMaxFrameY();
 
 	m_d2dContext->SetTransform(matS * matR * matT);
+	m_d2dContext->SetTarget(m_layer[layer]);
 
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
 		D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()),
@@ -662,6 +683,7 @@ void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, 
 	if (KEYMANAGER->isToggleKey(VK_F7))
 		m_d2dContext->DrawRectangle(D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()), m_blackBrush);
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
 };
 
 

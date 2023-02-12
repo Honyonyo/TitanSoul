@@ -66,5 +66,8 @@ void Scene::LoadTile(vector<tagTile*>* tileLayerVector, string filePath)
 		}
 	}
 
+	m_mapsizeX = m_tileLayerVector[0]->layerImage->GetFrameWidth();
+	m_mapsizeY = m_tileLayerVector[0]->layerImage->GetFrameHeight();
+
 	isLoaded = true;
 };
