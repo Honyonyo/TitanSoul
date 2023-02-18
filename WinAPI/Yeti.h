@@ -1,6 +1,7 @@
 #include "Boss.h"
 class Animation;
 class PixelCollision;
+class Snowball;
 class Yeti : public Boss
 {
 /*
@@ -36,7 +37,7 @@ private:
 
 	Animation* m_animation;
 	//[eMoveDirection][eActionNumCount]
-	vector<int> m_aniIndexArr[eMoveDirectionNumber][eActionNumCount];
+	vector<int> m_aniIndexArr[eMoveDirectionNumCount][eActionNumCount];
 	PixelCollision* m_pixelCollision;
 
 	eAction m_action;
@@ -60,6 +61,9 @@ private:
 	float m_rollingJumpMoveX;
 	float m_rollingJumpMoveY;
 	int m_rollingJumpCount;
+
+	//스노우볼 관련 변수
+	Snowball* snowball;
 /// <패턴>
 ///		1. 눈공던지기 4회
 ///		2. 구르기 -> 고드름

@@ -21,14 +21,11 @@ void Player::Init()
 	m_pixelCollision->Init();
 
 	m_inGround = false;
-	m_direction = eUp;
+	m_direction = eDown;
 	m_state = eIdle;
 	//씬에서 플레이어 위치 초기값을 뱉어주면 그거로 세팅하기
 	//커런트씬과 넥스트씬을 비교해서 넥스트씬에 switch로 플레이어위치초기값 조건달아서 뱉어주기
-	m_animation->SetPlayFrame(m_aniIndexArr[1][m_direction][m_state],true);
-
-	m_center.x = 496.0f;
-	m_center.y = 912.0f;
+	m_animation->SetPlayFrame(m_aniIndexArr[1][m_direction][m_state], true);
 
 	m_kinds = ePlayer;
 	m_isAlive = true;
@@ -40,6 +37,10 @@ void Player::Init()
 };
 void Player::Update()
 {
+	//플레이어 죽으면 동작 안하기
+	if (!m_isAlive) return;
+	if (m_sleep)return;
+
 	m_aniChange = false;
 
 	/// X키를 누르고 구르기동작중인 경우에는 구르기는 논캔슬이라 방향전환도 안되고, state변경도 안된다.
@@ -56,14 +57,20 @@ void Player::Update()
 	/// </direction변경에관하여>
 
 	int frameIndex = 0;
+	int prevAniIndex = m_animation->GetNowFrameIdx();
 	eMoveDirection prevDirction = m_direction;
 	eState prevState = m_state;
-	m_state = eIdle;
+	if (!m_animation->IsPlay())
+	{
+		m_state = eIdle;
+		m_nonCansleAction = false;
+	}
 
 	//C키 누르면 카메라 확대되기
 	//화살 있을때 - 발사모션 / 화살 없을때 - 회수모션
 	if (KEYMANAGER->isStayKeyDown('C'))
 	{
+		m_nonCansleAction = true;
 		CAMERA->SetScaleIncease(true);
 		if (m_arrow->GetIsShooted())
 		{
@@ -81,9 +88,12 @@ void Player::Update()
 		}
 
 	}//end if 'C'		선형보간 - 이동하는 목표점을 향해 가야할 경우 유용(난 필요 없을듯?)
-	else//C안누르거나 구르기상태 아닌 경우에만 MOVE가능
+	else if (!m_nonCansleAction)//C안누르거나 구르기상태 아닌 경우에만 MOVE가능
 	{
-		Move();
+		if (m_inGround)
+			Rolling();
+		if (m_state != eRolling && m_state != eRollingFail)
+			Move();
 	}//end if not 'C'
 
 	//C키 떼면 카메라 다시 돌아오기
@@ -99,23 +109,43 @@ void Player::Update()
 		{
 			m_arrow->SetIsReady(true);
 		}
+		m_nonCansleAction = false;
 	}
 
-	if (m_direction != prevDirction
-		|| m_state != prevState)
+	if (m_direction != prevDirction)
 	{
 		m_aniChange = true;
-		if (m_state == prevState)
+	}
+	if (m_state != prevState)
+	{
+		m_aniChange = true;
+		m_soundeffectCount = 0;
+		if (m_direction != prevDirction)
+		{
 			frameIndex = m_animation->GetNowFrameIdx();
+		}
+	}
+
+	m_hitboxCenter = m_center;
+	CoordSetting();
+	if (m_tileSpec == eTileWater || m_tileSpec == eTileWater2)
+	{
+		m_aniChange = m_inGround ? true : m_aniChange;
+		m_inGround = false;
+	}
+	else
+	{
+		m_aniChange = m_inGround ? m_aniChange : true;
+		m_inGround = true;
 	}
 
 	if (m_aniChange)
 	{
-		m_animation->SetPlayFrame(m_aniIndexArr[1][m_direction][m_state], true, frameIndex);
+		m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][m_state], false, frameIndex);
+		if (!m_animation->IsPlay()) m_animation->AniStart();
 	}
-
-	m_hitboxCenter = m_center;
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
+	PlaySoundEffect(prevAniIndex, m_animation->GetNowFrameIdx());
 
 	m_pixelCollision->Update();
 };
@@ -124,7 +154,7 @@ void Player::Render()
 	//그림자 렌더
 	//IMAGEMANAGER->CenterFrameRender(m_Image, );
 
-	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation, eLayerTop);
+	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation, eLayerPlayer);
 	IMAGEMANAGER->CenterAniRender(m_bowImage, m_center.x, m_center.y, m_animation, eLayerPlayer);
 };
 void Player::Release()
@@ -150,6 +180,8 @@ void Player::Hit(eObjectKinds kinds)
 
 void Player::Move()
 {
+	m_state = eIdle;
+
 	float speed = (KEYMANAGER->isStayKeyDown('X')) ? m_dashSpeed : m_moveSpeed;
 	bool isDash = (speed == m_dashSpeed) ? true : false;
 
@@ -162,13 +194,24 @@ void Player::Move()
 	/// 뗐을 때 : 다른 키를 누르고있다면 : 방향전환 ->어떻게 판별? state가 idle이 아닌 경우로 판별하기
 	/// 뗐을 때 : 다른 키를 누르는게 없다면 : 키 떼기 직전 방향을 바라보고 멈추기 ->state가 idle인 경우
 	/// </summary>
-
 	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
 	{
 		if (!m_pixelCollision->GetLeftColl()) m_center.x -= speed;
 		m_directionKey[0] = 1;
 		m_directionKey[2] = 0;
 		m_state = isDash ? eDash : eWalk;
+		if (m_tileSpec > eTileFuncStart)
+		{
+			switch (m_tileSpec)
+			{
+			case eTileStaireLeft:
+				m_center.y -= speed;
+				break;
+			case eTileStaireRight:
+				m_center.y += speed;
+				break;
+			}
+		}
 	}
 	if (KEYMANAGER->isStayKeyDown(VK_UP))
 	{
@@ -183,6 +226,18 @@ void Player::Move()
 		m_directionKey[0] = 0;
 		m_directionKey[2] = 1;
 		m_state = isDash ? eDash : eWalk;
+		if (m_tileSpec > eTileFuncStart)
+		{
+			switch (m_tileSpec)
+			{
+			case eTileStaireLeft:
+				m_center.y += speed;
+				break;
+			case eTileStaireRight:
+				m_center.y -= speed;
+				break;
+			}
+		}
 	}
 	if (KEYMANAGER->isStayKeyDown(VK_DOWN))
 	{
@@ -193,51 +248,115 @@ void Player::Move()
 	}
 	if (m_state != eIdle)
 	{
-		int direction = m_directionKey.to_ulong();
-
-		//bitset은 리틀엔디안으로 가는가보다..........  ㅠㅠ
-		//L1000 T0100 R0010 B0001
-		switch (direction)
-		{
-		case 1:
-			m_direction = eLeft;
-			break;
-		case 2:
-			m_direction = eUp;
-			break;
-		case 3:
-			m_direction = eLeftUp;
-			break;
-		case 4:
-			m_direction = eRight;
-			break;
-		case 6:
-			m_direction = eRightUp;
-			break;
-		case 8:
-			m_direction = eDown;
-			break;
-		case 9:
-			m_direction = eLeftDown;
-			break;
-		case 12:
-			m_direction = eRightDown;
-			break;
-		default:
-			NULL;
-		}
+		DirectionSetting();
 	}
 
 };
 
+void Player::Rolling()
+{
+	if (KEYMANAGER->isOnceKeyDown('X'))
+	{
+		m_state = eRolling;
+		m_aniChange = true;
+		m_nonCansleAction = true;
+	}
+
+	if (m_state == eRolling)
+	{
+		if (m_pixelCollision->GetIsColl())
+		{
+			m_aniChange = true;
+			bool check[2] = { false };
+			for (int i = 0; i < 4; i++)
+			{
+				if (i < 2)
+				{
+					if (m_directionKey[i])
+					{
+						m_directionKey[i] = 0;
+						int tmp = (i + 2) % 4;
+						m_directionKey[tmp] = 1;
+						check[i] = true;
+					}
+				}
+				else if (!check[i - 2])
+				{
+					if (m_directionKey[i])
+					{
+						m_directionKey[i] = 0;
+						int tmp = (i + 2) % 4;
+						m_directionKey[tmp] = 1;
+					}
+				}
+			}//end for
+		}//end pixcelColl
+		else
+		{
+			if (m_directionKey[0])
+				m_center.x -= m_dashSpeed;
+			else if (m_directionKey[2])
+				m_center.x += m_dashSpeed;
+			if (m_directionKey[1])
+				m_center.y -= m_dashSpeed;
+			else if (m_directionKey[3])
+				m_center.y += m_dashSpeed;
+		}//end noColl
+	}//end stateRolling
+};
+
+void Player::DirectionSetting()
+{
+	int direction = m_directionKey.to_ulong();
+
+	//bitset은 리틀엔디안으로 가는가보다..........  ㅠㅠ
+	//L1000 T0100 R0010 B0001
+	switch (direction)
+	{
+	case 1:
+		m_direction = eLeft;
+		break;
+	case 2:
+		m_direction = eUp;
+		break;
+	case 3:
+		m_direction = eLeftUp;
+		break;
+	case 4:
+		m_direction = eRight;
+		break;
+	case 6:
+		m_direction = eRightUp;
+		break;
+	case 8:
+		m_direction = eDown;
+		break;
+	case 9:
+		m_direction = eLeftDown;
+		break;
+	case 12:
+		m_direction = eRightDown;
+		break;
+	default:
+		NULL;
+	}
+}
+
+
 void Player::SetAnimationFrame()
 {
-	for (int i = 0; i < eMoveDirectionNumber; i++)
+	for (int i = 0; i < eMoveDirectionNumCount; i++)
 	{
 		for (int j = 0; j < 6; j++)
 		{
 			m_aniIndexArr[1][i][eWalk].push_back(j + m_animation->GetFrameNumWidth() * i);
-			m_aniIndexArr[1][i][eRolling].push_back(i * (6 + m_animation->GetFrameNumWidth()) + j);
+			m_aniIndexArr[1][i][eRolling].push_back(j + 6 + m_animation->GetFrameNumWidth() * i);
+		}
+		for (int j = 0; j < 8; j++)
+		{
+			m_aniIndexArr[0][i][eWalk].push_back(j + m_animation->GetFrameNumWidth() * (i + 8));
+			m_aniIndexArr[0][i][eDash].push_back(j + m_animation->GetFrameNumWidth() * (i + 8));
+			m_aniIndexArr[0][i][eIdle].push_back(j + m_animation->GetFrameNumWidth() * (i + 8));
 		}
 		for (int j = 0; j < 12; j++)
 		{
@@ -246,8 +365,8 @@ void Player::SetAnimationFrame()
 		m_aniIndexArr[1][i][eShotting].push_back(13 + m_animation->GetFrameNumWidth() * i);
 		m_aniIndexArr[1][i][eCall].push_back(14 + m_animation->GetFrameNumWidth() * i);
 		m_aniIndexArr[1][i][eIdle].push_back(i * m_animation->GetFrameNumWidth());
-		//m_aniIndexArr[1][i][eRollingSuccess].push_back(i * 72);
-		//m_aniIndexArr[1][i][eRollingFail].push_back(i * 71);
+		m_aniIndexArr[1][i][eRollingSuccess].push_back(i * 72);
+		m_aniIndexArr[1][i][eRollingFail].push_back(i * 71);
 		//for (int j = 0; j < 6; j++)
 		//{
 		//	
@@ -264,12 +383,79 @@ void Player::SetAnimationFrame()
 	m_animation->AniStart();
 }
 
+void Player::PlaySoundEffect(int prevAniIdx, int nowAniIdx)
+{
+	//if (m_state != eWalk && m_state != eDash) return;
+	//if (prevAniIdx == nowAniIdx) return;
+
+	switch (m_state)
+	{
+	case eDash:
+	case eWalk:
+		if (prevAniIdx != nowAniIdx)
+		{
+			if (m_state != eWalk || nowAniIdx % 2 == 0)
+			{
+				char num = m_soundeffectCount + 48;
+				//발자국소리 효과음 key값 조합
+				string tmp;
+				switch (m_tileSpec)
+				{
+				case eTileGrass:
+					tmp = "GrassStep";
+					tmp += num;
+					break;
+
+				case eTileStone:
+					tmp = "StoneStep";
+					tmp += num;
+					break;
+
+				case eTileSnow:
+					tmp = "SnowStep";
+					tmp += num;
+					break;
+
+				case eTileIce:
+					tmp = "IceStep";
+					tmp += num;
+					break;
+				default:
+					break;
+				}//end switch tileSpec
+				SOUNDMANAGER->play(tmp, 1.f);
+			}
+			++m_soundeffectCount > 8 ? m_soundeffectCount = 1 : (NULL);
+		}//end if aniFrameChanged
+
+		break;	//end case Dash&Walk
+	case eRolling:
+	{
+		//롤링 사운드 넣기
+		//롤링 모션 넣기
+		if (nowAniIdx == 0)
+		{
+
+		}
+	}
+	break;
+	case eShotting:
+		break;
+	case eStageClear:
+		break;
+	default: break;
+	}
+}
+
 Player::Player() :
 	m_moveSpeed(0.5),
 	m_dashSpeed(1),
 	m_aniChange(false),
+	m_nonCansleAction(false),
 	m_inGround(true),
-	m_state(eIdle)
+	m_sleep(false),
+	m_state(eIdle),
+	m_soundeffectCount(1)
 {
 	m_direction = eDown;
 };

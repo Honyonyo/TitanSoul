@@ -23,6 +23,7 @@ static const enum eTileLayerType
 {
 	eBG = 0,	//¹Ù´Ú
 	eFG,	//º®
+	eWall,
 	eCOL,	//ÇÈÃæ
 	eMAT,
 	eTileLayerTypeCount
@@ -110,10 +111,11 @@ public:
 	void Render(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void CropRender(CImage* img, float x, float y, RECT cropRc, bool isReversed = false, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void SampleRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
-	void CenterRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
+	void CenterUIRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
 	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed = false,  float rot = 0, float alpha = 1);
 	void FrameRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
-	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer,float scale = 1, float rot = 0, float alpha = 1);
+	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, float scaleX = 1, float scaleY = 1, float rot = 0, float alpha = 1);
+	void CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, D2D1_POINT_2F sCenter, float scaleX = 1, float scaleY = 1, float rot = 0, float alpha = 1);
 
 	void TileRender(eTileSheetKey key, int tileNumber, int low, int column, int tileLineMaxNumber = 64);
 
@@ -126,6 +128,7 @@ public:
 	GImage* AddBackBuffer(string key, float width, float height);
 
 	ID2D1Bitmap1* AddBitmap(std::wstring path, UINT* Width, UINT* Height);
+	ID2D1Bitmap1* CreateBitmapFromHBit(HBITMAP hbit);
 	CImage* AddImage(const std::string key, std::wstring path);
 	CImage* AddImage(const std::string key, std::wstring path, int maxFrameX = 1, int maxFrameY = 1);
 	CImage* AddTileSheet(eTileSheetKey key, std::wstring path);
@@ -139,7 +142,7 @@ public:
 
 	void DrawCircle(float x, float y, float width);
 	void DrawCircleCamera(float x, float y, float width);
-	void DrawRect(RECT rt);
+	void DrawBlackRect(RECT rt, eLayer layer, float opacity = 1);
 	void DrawRectCenter(RECT rt, CImage* img);
 	void DrawColorRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, D2D1_COLOR_F colr);
 

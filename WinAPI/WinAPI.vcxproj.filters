@@ -55,6 +55,15 @@
     <Filter Include="Object\Boss\Yeti">
       <UniqueIdentifier>{f2b35a60-b4cc-4a38-a1db-ffabc4ded449}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Object\Boss\Sludgeheart">
+      <UniqueIdentifier>{06e1146d-6add-4a26-a775-57ff603e5a23}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Door">
+      <UniqueIdentifier>{a2584e89-8d59-4279-a476-a609e444c5e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object\Boss\Colossus">
+      <UniqueIdentifier>{6dc4d038-b326-4cea-a25a-02d3e574ddd4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C3DMatrix.cpp">
@@ -102,9 +111,6 @@
     </ClCompile>
     <ClCompile Include="MapToolScene.cpp">
       <Filter>MapTool</Filter>
-    </ClCompile>
-    <ClCompile Include="SludgeheartScene.cpp">
-      <Filter>Scene</Filter>
     </ClCompile>
     <ClCompile Include="StaticEnumMethod.cpp">
       <Filter>API FrameWork\Manager</Filter>
@@ -160,6 +166,25 @@
     <ClCompile Include="GameData.cpp">
       <Filter>API FrameWork\Manager</Filter>
     </ClCompile>
+    <ClCompile Include="SludgeheartScene.cpp">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClCompile>
+    <ClCompile Include="Sludgeheart.cpp">
+      <Filter>Object\Boss\Sludgeheart</Filter>
+    </ClCompile>
+    <ClCompile Include="Floor.cpp">
+      <Filter>Scene\Field</Filter>
+    </ClCompile>
+    <ClCompile Include="Door.cpp">
+      <Filter>Object\Door</Filter>
+    </ClCompile>
+    <ClCompile Include="Colossus.cpp">
+      <Filter>Object\Boss\Colossus</Filter>
+    </ClCompile>
+    <ClCompile Include="ColossusScene.cpp">
+      <Filter>Scene\Field</Filter>
+    </ClCompile>
+    <ClCompile Include="IntroScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMatrix.h">
@@ -217,9 +242,6 @@
     <ClInclude Include="MapToolScene.h">
       <Filter>MapTool</Filter>
     </ClInclude>
-    <ClInclude Include="SludgeheartScene.h">
-      <Filter>Scene</Filter>
-    </ClInclude>
     <ClInclude Include="Scene.h">
       <Filter>Scene</Filter>
     </ClInclude>
@@ -274,6 +296,25 @@
     <ClInclude Include="enumList.h">
       <Filter>API FrameWork\PCH</Filter>
     </ClInclude>
+    <ClInclude Include="SludgeheartScene.h">
+      <Filter>Scene\Field\FrostMountains</Filter>
+    </ClInclude>
+    <ClInclude Include="Sludgeheart.h">
+      <Filter>Object\Boss\Sludgeheart</Filter>
+    </ClInclude>
+    <ClInclude Include="Floor.h">
+      <Filter>Scene\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="Door.h">
+      <Filter>Object\Door</Filter>
+    </ClInclude>
+    <ClInclude Include="Colossus.h">
+      <Filter>Object\Boss\Colossus</Filter>
+    </ClInclude>
+    <ClInclude Include="ColossusScene.h">
+      <Filter>Scene\Field</Filter>
+    </ClInclude>
+    <ClInclude Include="IntroScene.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinAPI.rc" />
@@ -286,6 +327,15 @@
       <Filter>Scene\json</Filter>
     </None>
     <None Include="SlugeheartMap.json">
+      <Filter>Scene\json</Filter>
+    </None>
+    <None Include="Floor.json">
+      <Filter>Scene\json</Filter>
+    </None>
+    <None Include="ColossusMap.json">
+      <Filter>Scene\json</Filter>
+    </None>
+    <None Include="Title.json">
       <Filter>Scene\json</Filter>
     </None>
   </ItemGroup>

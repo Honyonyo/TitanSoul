@@ -3,6 +3,7 @@
 void ImageManager::LayerTypeTableGenerator()
 {
 	layerTypeTable.insert(make_pair("BG", eBG));
+	layerTypeTable.insert(make_pair("WALL", eWall));
 	layerTypeTable.insert(make_pair("FG", eFG));
 	layerTypeTable.insert(make_pair("COL", eCOL));
 	layerTypeTable.insert(make_pair("MAT", eMAT));

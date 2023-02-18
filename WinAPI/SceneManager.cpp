@@ -98,9 +98,7 @@ HRESULT SceneManager::changeScene(string SceneName)
     if (SUCCEEDED(find->second->Init()))
     {
         _currentScene = find->second;
-        cout << "ÇöÀç ¾À ÁÖ¼Ò " << _currentScene << endl;
-        cout << "¿¹Æ¼ ¾À ÁÖ¼Ò " << _mSceneList.find(SceneName)->second << endl;
-        PLAYER->SetPosition(_currentScene->GetMapWidth()/2, _currentScene->GetMapHeight()/2);
+        PLAYER->SetPosition(_currentScene->GetPlayerStartPos());
         _camera->SetMapSize(_currentScene->GetMapWidth(), _currentScene->GetMapHeight());
         cout << "¸Ê ¹Ù²Ù±â. »õ ¸Ê »çÀÌÁî : "<< _currentScene->GetMapWidth() <<", "<< _currentScene->GetMapHeight() <<endl;
         return S_OK;
@@ -125,6 +123,10 @@ float SceneManager::GetCurrentSceneHeight()
         return NULL;
     }
     return _currentScene->GetMapHeight();
+}
+int SceneManager::GetCurrentSceneTileMatSpec(int latitude, int longitude)
+{
+    return _currentScene->GetMattileSpec(latitude, longitude);
 }
 
 COLORREF** SceneManager::GetCurrentScenePixel()

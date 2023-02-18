@@ -21,6 +21,7 @@ void Yeti::Init()
 	m_attackCenter.x = m_center.x;
 	m_attackCenter.y = m_center.y + 16;
 	m_attackRange = 32;
+	m_hitboxRange = 12;
 
 	m_pixelCollision = new PixelCollision(&m_center, 0, 16, 64, 64);
 	m_pixelCollision->Init();
@@ -137,7 +138,7 @@ void Yeti::Render()
 	{
 
 	}
-	else { IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f, 0, 0.5); }
+	else { IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f,0.75, 0, 0.5); }
 	if (m_direction == eLeft || m_direction == eLeftDown || m_direction == eLeftUp)
 	{
 		IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer, true);
@@ -147,6 +148,7 @@ void Yeti::Render()
 
 void Yeti::Release()
 {
+	m_isDelete = true;
 }
 
 void Yeti::Attack(eObjectKinds kinds)
@@ -163,39 +165,48 @@ void Yeti::Attack(eObjectKinds kinds)
 
 void Yeti::Hit(eObjectKinds kinds)
 {
+	switch (kinds)
+	{
+	case eArrow:
+		m_isOnHit = true;
+		break;
+	default:
+		break;
+	}
 }
 
 void Yeti::SetPattern()
 {
-	//int a = RND->getInt(3);
-	//switch (a)
-	//{
-	//case 0:
-	//	if (m_action == eThrow) { m_pattern.push(eReady); }
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	break;
-	//case 1:
-	//	if (m_action == eRolling) { m_pattern.push(eReady); }
-	//	a = RND->getInt(10);
-	//	if (a < 1) a = 1;
-	//	else if (a < 3) a = 2;
-	//	else if (a < 7) a = 3;
-	//	else a = 4;
-	//	for (int i = 0; i < a; i++)
-	//	{
-	//		m_pattern.push(eRolling);
-	//	}
-	//	break;
-	//case 2:
-	//	m_pattern.push(eReady);
-	//	break;
-	//default:
-	//	cout << "예티 패턴 넣기 실패" << endl;
-	//}
-	m_pattern.push(eRolling);
+	int a = RND->getInt(3);
+	switch (a)
+	{
+	case 0:
+		if (m_action == eThrow) { m_pattern.push(eReady); }
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		break;
+	case 1:
+		if (m_action == eRolling) { m_pattern.push(eReady); }
+		a = RND->getInt(10);
+		if (a < 1) a = 1;
+		else if (a < 3) a = 2;
+		else if (a < 7) a = 3;
+		else a = 4;
+		for (int i = 0; i < a; i++)
+		{
+			m_pattern.push(eRolling);
+		}
+		break;
+	case 2:
+		m_pattern.push(eReady);
+		break;
+	default:
+		cout << "예티 패턴 넣기 실패" << endl;
+	}
+	//m_pattern.push(eRolling);
+	//m_pattern.push(eThrow);
 };
 
 void Yeti::SetThrowSnowball()
@@ -204,6 +215,11 @@ void Yeti::SetThrowSnowball()
 	m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eThrow]);
 	m_animation->AniStart();
 	m_animation->SetFPS(7);
+
+	//3프레임에서 render시작, 4프레임에서 shot
+	snowball = new Snowball(m_center.x, m_center.y - TILE_SIZE);
+	snowball->Init();
+	OBJECTMANAGER->AddObject(snowball);
 };
 void Yeti::SetRolling()
 {
@@ -222,7 +238,23 @@ void Yeti::SetReady()
 
 void Yeti::ThrowSnowball()
 {
-
+	//프레임이 3번일때 m_render==false 면 SetRender호출(Get함수 만드러야함)
+	if (m_animation->GetNowFrameIdx()==3)
+	{
+		if (!snowball->GetIsRender())
+		{
+			snowball->SetRender();
+		}
+	}
+	//프레임이 4번일 때 shot snowball 후 snowball = nullptr;
+	if (m_animation->GetNowFrameIdx() == 4)
+	{
+		if (snowball != nullptr)
+		{
+			snowball->SetMove(PLAYER->GetPointF());
+			snowball = nullptr;
+		}
+	}
 }
 void Yeti::Rolling()
 {
@@ -353,32 +385,33 @@ void Yeti::IcicleDrop()
 	//고드름간 최대거리 : 2고드름
 	//고드름간 최소거리 : 1고드름
 	//중심선 기준 편차 : 1고드름
+
+	//플레이어와의 각도가 y축과 수평에 가까워질수록 터진다
 	D2D1_POINT_2F playerpoint = PLAYER->GetPointF();
 	float slop;
-	float tmp =2;
-	//if (playerpoint.x - m_center.x <TILE_SIZE)
-	//{
-		slop = (m_center.x>playerpoint.x)?-tanf(m_rotRad):tanf(m_rotRad);
-	//}
-	//else
-	//{
-	//	slop = (m_center.x > playerpoint.x) ? -(m_center.y- playerpoint.y) / (m_center.x- playerpoint.x) : (m_center.y - playerpoint.y) / (m_center.x - playerpoint.x);
-	//	tmp = (slop > 0) ? 2 : -2;
-	//}
-	int i = 1;
-	POINT dropCenter = { 8 + (m_center.x) / TILE_SIZE * TILE_SIZE, 8 + (m_center.y/ TILE_SIZE)*TILE_SIZE };
-	while (i<10)
+	float tmp = (m_center.x > playerpoint.x) ? -2 : 2;
+	if (playerpoint.x - m_center.x < TILE_SIZE)
 	{
-		
-		dropCenter.x += tmp*TILE_SIZE;
-		dropCenter.y += slop * TILE_SIZE * 2;
-		if (SCENEMANAGER->GetCurrentScenePixel()[dropCenter.x][dropCenter.y] != RGB(0,0,0))
+		slop = (m_center.x > playerpoint.x) ? -tanf(m_rotRad) : tanf(m_rotRad);
+	}
+	else
+	{
+		slop =  (m_center.y - playerpoint.y) / (m_center.x - playerpoint.x);
+	}
+	int i = 1;
+	POINT dropCenter = { 8 + (m_center.x) / TILE_SIZE * TILE_SIZE, 8 + (m_center.y / TILE_SIZE) * TILE_SIZE };
+	while (i < 7)
+	{
+
+		dropCenter.x += (tmp +RND->getfloat(1.6)-0.8)* TILE_SIZE;
+		dropCenter.y += (slop+RND->getfloat(1.6) -0.8) * TILE_SIZE * 2;
+		if (SCENEMANAGER->GetCurrentScenePixel()[dropCenter.x][dropCenter.y] != RGB(0, 0, 0))
 		{
-		//	break;
+				break;
 		}
-	//	else 
+		else 
 		{
-			OBJECTMANAGER->AddObject<Icicle>()->Setting(dropCenter.x, dropCenter.y, 1);
+			OBJECTMANAGER->AddObject<Icicle>()->Setting(dropCenter.x, dropCenter.y, i%3);
 			i++;
 		}
 
@@ -398,6 +431,36 @@ void Yeti::SetCollUpdate(int aniIdx)
 		//hitpoint잡아주고, attack off
 		m_isOnAttack = false;
 		m_isOnHit = true;
+		switch (m_direction)
+		{
+		case eRight:
+			m_hitboxCenter.x = m_center.x - 16;
+			m_hitboxCenter.y = m_center.y + 22;
+			break;
+		case eUp:
+			m_hitboxCenter.x = m_center.x;
+			m_hitboxCenter.y = m_center.y + 22;
+			break;
+		case eLeft:
+			m_hitboxCenter.x = m_center.x + 16;
+			m_hitboxCenter.y = m_center.y + 22;
+			break;
+		case eDown:
+		case eRightDown:
+		case eLeftDown:
+			m_isOnHit = false;
+			break;
+		case eLeftUp:
+			m_hitboxCenter.x = m_center.x + 8;
+			m_hitboxCenter.y = m_center.y + 22;
+			break;
+		case eRightUp:
+			m_hitboxCenter.x = m_center.x - 8;
+			m_hitboxCenter.y = m_center.y + 22;
+			break;
+		default:
+			break;
+		}
 
 		break;
 	case eRolling:
@@ -424,7 +487,7 @@ void Yeti::SetAnimationFrame()
 {
 	if (m_isAlive)
 	{
-		for (int i = 0; i < eMoveDirectionNumber; i++)
+		for (int i = 0; i < eMoveDirectionNumCount; i++)
 		{
 			m_aniIndexArr[i][eSit].push_back(73);
 		}
@@ -545,11 +608,12 @@ void Yeti::SetStart()
 }
 
 Yeti::Yeti()
-	:m_rollingSpeed(10), m_maxSnowball(4), m_action(eSit),
+	:m_rollingSpeed(8), m_maxSnowball(4), m_action(eSit),
 	m_isAction(false), m_isSleep(true), m_isOnRollingLoop(false), m_hitWall(false),
 	m_rollingJumpMoveX(0), m_rollingJumpMoveY(0),
 	m_rot(0), m_rotRad(0),
-	m_rollingJumpSpeed(0), m_rollingGravity(0), m_rollingDefJumpSpeed(278)
+	m_rollingJumpSpeed(0), m_rollingGravity(0), m_rollingDefJumpSpeed(278),
+	snowball(nullptr)
 {
 	m_direction = eDown;
 	m_isOnHit = false;

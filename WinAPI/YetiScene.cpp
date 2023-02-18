@@ -11,7 +11,6 @@ HRESULT YetiScene::Init(void)
 		isLoaded = true;
 	}
 
-	PLAYER->SetPosition(496.0f, 912.0f);
 	m_yeti = new Yeti;
 	m_yeti->Init();
 
@@ -35,7 +34,6 @@ void YetiScene::Update(void)
 
 void YetiScene::Render(void)
 {
-	IMAGEMANAGER->DrawRect({ 0,0,WINSIZE_X, WINSIZE_Y });
 	m_iterTileLayerVector = m_tileLayerVector.begin();
 
 	for (; m_iterTileLayerVector != m_tileLayerVector.end(); m_iterTileLayerVector++)
@@ -43,37 +41,42 @@ void YetiScene::Render(void)
 		switch ((*m_iterTileLayerVector)->layerType)
 		{
 		case eBG:	//¹Ù´Ú ·»´õ
-			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX/2, m_mapsizeY/2, 0, 0,eLayerBg);
+			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerBg);
 			break;
 		case eFG:	//º® ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F1))
 			{
-				IMAGEMANAGER->Render((*m_iterTileLayerVector)->layerImage, 0, 0);
+				IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerWall);
 			}
 			break;
 		case eCOL:	//Ãæµ¹ ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F2))
 			{
-				IMAGEMANAGER->Render((*m_iterTileLayerVector)->layerImage, 0, 0);
+				IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerUnderPlayer);
 			}
 			break;
 		case eMAT:	//±â´É¹ßÆÇ ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F3))
 			{
-				IMAGEMANAGER->Render((*m_iterTileLayerVector)->layerImage, 0, 0);
+				IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerUnderPlayer);
 			}
 			break;
 		}
+		if (KEYMANAGER->isToggleKey(VK_F4))
+		{
+			IMAGEMANAGER->CenterFrameRender(m_collLayer->GetRenderImage(), m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerUnderPlayer);
+			
+		}
 	}
-
 }
 
 YetiScene::YetiScene()
+	:m_yeti(nullptr)
 {
 	LoadTile(&m_tileLayerVector, "YetiMap.json");
-
+	m_playerStartPos = { 496.0f, 450.0f };
 };
 YetiScene::~YetiScene()
 {
-
+	m_yeti->Release();
 };

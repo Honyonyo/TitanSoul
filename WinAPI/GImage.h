@@ -34,6 +34,7 @@ private:
 	bool			_isTrans;		//배경색
 	COLORREF		_transColor;	//배경색 없앨 RGB (RGB(255,0,255))
 
+	CImage* _renderImg;
 
 	//렌더 대상을 hdc나 memDC로 잡고 렌더를 하고있는데
 	//그 대상으로 GImage의 hmemDC를 선택한다면
@@ -46,6 +47,7 @@ public:
 	HRESULT Init(float width, float height);
 	HRESULT Init(string path, float width, float height);
 	HDC GetMemDC() { return _imageInfo->hMemDC; }
+	CImage* GetRenderImage() { return _renderImg; }
 	float GetWidth() { return _imageInfo->width; }
 	float GetHight() { return _imageInfo->height; }
 	void TileRender(GImage* tileSheet, vector<vector<int>> tileVector, int tileStartNum);

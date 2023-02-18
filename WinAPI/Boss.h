@@ -2,6 +2,9 @@
 #include "Object.h"
 class Boss : public Object
 {
+protected:
+	bool m_wakeup;
+
 private:
 	float m_deffendCircle;
 	RECT m_deffendRect;

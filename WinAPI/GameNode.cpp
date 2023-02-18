@@ -82,6 +82,8 @@ LRESULT GameNode::MainProc(HWND hWnd, UINT iMsg, WPARAM wParam, LPARAM lParam) {
         case VK_ESCAPE:
             PostMessage(hWnd, WM_DESTROY, 0, 0);
             break;
+        case VK_SPACE:
+            system("cls");
         }
         break;
 

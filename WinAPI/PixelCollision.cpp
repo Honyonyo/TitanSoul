@@ -49,7 +49,7 @@ void PixelCollision::LeftCheck()
 		bool breakProveL = false;
 		for (int i = 0; i < eCollisionSpecNumCount; i++)
 		{
-			if (m_pixel[m_provbox.left][provLeft] != m_collColor[i])
+			if (m_pixel[provLeft][m_provbox.left] != m_collColor[i])
 			{
 				continue;
 			}//색이 다를 때 : 다음루프로
@@ -57,7 +57,7 @@ void PixelCollision::LeftCheck()
 			{
 				switch (i)
 				{
-
+					cout << "left " << m_pixel[provLeft][m_provbox.left] << endl;
 				case eDiagonal:
 					break;
 				case eWall:
@@ -66,7 +66,7 @@ void PixelCollision::LeftCheck()
 					//밀어주기! 색이 다른 점이 나올 때까지 찾고, 다른 점이 나오면 거기에서부터 탐지width만큼 center를 옮긴다.
 					for (int pushLeft = m_provbox.left; pushLeft <= m_provbox.left + m_provWidth / 2; pushLeft++)
 					{
-						if (m_pixel[pushLeft][provLeft] != m_collColor[i])
+						if (m_pixel[provLeft][pushLeft] != m_collColor[i])
 						{
 							m_center->x = pushLeft + m_provWidth * 0.5f - m_centerDistanceX;
 							break;
@@ -75,7 +75,7 @@ void PixelCollision::LeftCheck()
 					breakProveL = true;
 					break;
 				default:
-					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[m_provbox.left][provLeft] << endl;
+					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[provLeft][m_provbox.left] << endl;
 				}
 
 			}//색이 같을 때 : swicth에서 조건돌려주기
@@ -92,12 +92,14 @@ void PixelCollision::TopCheck()
 		bool breakProveT = false;
 		for (int i = 0; i < eCollisionSpecNumCount; i++)
 		{
-			if (m_pixel[provTop][m_provbox.top] != m_collColor[i])
+			if (m_pixel[m_provbox.top][provTop] != m_collColor[i])
 			{
+				//cout<<"어디서터짐2" << endl;
 				continue;
 			}//색이 다를 때 : 다음루프로
 			else
 			{
+			cout<<"top "<< m_pixel[m_provbox.top][provTop] << endl;
 				switch (i)
 				{
 				case eDiagonal:
@@ -108,7 +110,7 @@ void PixelCollision::TopCheck()
 					//밀어주기! 색이 다른 점이 나올 때까지 찾고, 다른 점이 나오면 거기에서부터 탐지width만큼 center를 옮긴다.
 					for (int pushTop = m_provbox.top; pushTop <= m_provbox.top + m_provHeight / 2; pushTop++)
 					{
-						if (m_pixel[provTop][pushTop] != m_collColor[i])
+						if (m_pixel[pushTop][provTop] != m_collColor[i])
 						{
 							m_center->y = pushTop + m_provHeight * 0.5f - m_centerDistanceY;
 							break;
@@ -117,7 +119,7 @@ void PixelCollision::TopCheck()
 					breakProveT = true;
 					break;
 				default:
-					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[provTop][m_provbox.top] << endl;
+					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[m_provbox.top][provTop] << endl;
 				}
 
 			}//색이 같을 때 : swicth에서 조건돌려주기
@@ -134,12 +136,13 @@ void PixelCollision::RightCheck()
 		bool breakProveR = false;
 		for (int i = 0; i < eCollisionSpecNumCount; i++)
 		{
-			if (m_pixel[m_provbox.right][provRight] != m_collColor[i])
+			if (m_pixel[provRight][m_provbox.right] != m_collColor[i])
 			{
 				continue;
 			}//색이 다를 때 : 다음루프로
 			else
 			{
+				cout << "right " << m_pixel[provRight][m_provbox.right] << endl;
 				switch (i)
 				{
 				case eDiagonal:
@@ -150,7 +153,7 @@ void PixelCollision::RightCheck()
 					//밀어주기! 색이 다른 점이 나올 때까지 찾고, 다른 점이 나오면 거기에서부터 탐지width만큼 center를 옮긴다.
 					for (int pushRight = m_provbox.right; pushRight >= m_provbox.right - m_provWidth / 2; pushRight--)
 					{
-						if (m_pixel[pushRight][provRight] != m_collColor[i])
+						if (m_pixel[provRight][pushRight] != m_collColor[i])
 						{
 							m_center->x = pushRight - m_provWidth * 0.5f - m_centerDistanceX;
 							break;
@@ -159,7 +162,7 @@ void PixelCollision::RightCheck()
 					breakProveR = true;
 					break;
 				default:
-					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[m_provbox.right][provRight] << endl;
+					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[provRight][m_provbox.right] << endl;
 				}
 
 			}//색이 같을 때 : swicth에서 조건돌려주기
@@ -176,12 +179,13 @@ void PixelCollision::BottomCheck()
 		bool breakProveB = false;
 		for (int i = 0; i < eCollisionSpecNumCount; i++)
 		{
-			if (m_pixel[provBottom][m_provbox.bottom] != m_collColor[i])
+			if (m_pixel[m_provbox.bottom][provBottom] != m_collColor[i])
 			{
 				continue;
 			}//색이 다를 때 : 다음루프로
 			else
 			{
+				cout << "bottom " << m_pixel[m_provbox.bottom][provBottom] << endl;
 				switch (i)
 				{
 				case eDiagonal:
@@ -192,7 +196,7 @@ void PixelCollision::BottomCheck()
 					//밀어주기! 색이 다른 점이 나올 때까지 찾고, 다른 점이 나오면 거기에서부터 탐지width만큼 center를 옮긴다.
 					for (int pushBottom = m_provbox.bottom; pushBottom >= m_provbox.bottom - m_provHeight / 2; pushBottom--)
 					{
-						if (m_pixel[provBottom][pushBottom] != m_collColor[i])
+						if (m_pixel[pushBottom][provBottom] != m_collColor[i])
 						{
 							m_center->y = pushBottom - m_provHeight * 0.5f - m_centerDistanceY;
 							break;
@@ -201,7 +205,7 @@ void PixelCollision::BottomCheck()
 					breakProveB = true;
 					break;
 				default:
-					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[provBottom][m_provbox.bottom] << endl;
+					cout << "픽셀충돌처리 케이스에 안걸림. 현재 컬러색상 " << m_pixel[m_provbox.bottom][provBottom] << endl;
 				}
 
 			}//색이 같을 때 : swicth에서 조건돌려주기

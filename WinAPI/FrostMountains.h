@@ -1,5 +1,6 @@
 #include "Scene.h"
 #include "YetiScene.h"
+#include "SludgeheartScene.h"
 
 class FrostMountainsField : public Scene
 {
@@ -18,6 +19,7 @@ class FrostMountains : public Scene
 {
 private:
 	YetiScene* m_yetiScene;
+	SludgeheartScene* m_sludgeheartScene;
 	FrostMountainsField* m_field;
 	Scene* m_currentArea;
 

@@ -69,5 +69,14 @@ void Scene::LoadTile(vector<tagTile*>* tileLayerVector, string filePath)
 	m_mapsizeX = m_tileLayerVector[0]->layerImage->GetFrameWidth();
 	m_mapsizeY = m_tileLayerVector[0]->layerImage->GetFrameHeight();
 
+	for (m_matTileLayer = m_tileLayerVector.begin(); m_matTileLayer != m_tileLayerVector.end();)
+	{
+		if ((*m_matTileLayer)->layerType == eMAT)
+		{
+			break;
+		}
+		else m_matTileLayer++;
+	}
+
 	isLoaded = true;
 };

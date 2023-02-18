@@ -63,14 +63,14 @@ void Arrow::Render()
 	//활시위 당길때
 	if (m_isDrawed)
 	{
-		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,m_rot);
+		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,1,1,m_rot);
 	}
 	//활시위 안당길 때 (분기 쏘았는가 아닌가로 나뉨)
 	else
 	{
 		if (m_isShotted)
 		{
-			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer, m_rot);
+			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,1,1, m_rot);
 		}
 		else
 		{

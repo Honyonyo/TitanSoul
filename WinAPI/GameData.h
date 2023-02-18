@@ -5,6 +5,7 @@
 const static enum eBossList
 {
 	eYeti = 0,
+	eSludgeheart,
 
 	eBossListNumCount
 };

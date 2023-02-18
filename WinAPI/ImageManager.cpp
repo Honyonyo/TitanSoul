@@ -160,7 +160,7 @@ void ImageManager::Init()
 	D2D1_BITMAP_PROPERTIES1 layerBitmapProperties =
 		D2D1::BitmapProperties1
 		(
-			D2D1_BITMAP_OPTIONS_TARGET| D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
+			D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
 			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_PREMULTIPLIED),
 			dpiX,
 			dpiY
@@ -168,7 +168,7 @@ void ImageManager::Init()
 	D2D1_BITMAP_PROPERTIES1 basiclayerBitmapProperties =
 		D2D1::BitmapProperties1
 		(
-			D2D1_BITMAP_OPTIONS_TARGET| D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
+			D2D1_BITMAP_OPTIONS_TARGET | D2D1_BITMAP_OPTIONS_GDI_COMPATIBLE,
 			D2D1::PixelFormat(DXGI_FORMAT_B8G8R8A8_UNORM, D2D1_ALPHA_MODE_IGNORE),
 			dpiX,
 			dpiY
@@ -184,10 +184,10 @@ void ImageManager::Init()
 		D2D1_FEATURE_LEVEL_DEFAULT
 	);
 
-		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &basiclayerBitmapProperties, &m_layerEmpty);
+	m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y), NULL, NULL, &basiclayerBitmapProperties, &m_layerEmpty);
 	for (int i = 0; i < eLayerNumCount; i++)
 	{
-		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y),NULL, NULL, &layerBitmapProperties, &m_layer[i]);
+		m_d2dContext->CreateBitmap(D2D1::SizeU(WINSIZE_X, WINSIZE_Y), NULL, NULL, &layerBitmapProperties, &m_layer[i]);
 	}
 
 
@@ -287,6 +287,28 @@ ID2D1Bitmap1* ImageManager::AddBitmap(std::wstring path, UINT* Width, UINT* Heig
 	frameDecode->Release();
 	converter->Release();
 
+	return bitmap;
+}
+
+ID2D1Bitmap1* ImageManager::CreateBitmapFromHBit(HBITMAP hbit)
+{
+	ID2D1Bitmap1* bitmap;
+
+	ComPtr<IWICBitmap> wicBmp;
+	ComPtr<IWICFormatConverter> wicFormatConverter;
+	WICBitmapAlphaChannelOption opt = WICBitmapUseAlpha;
+	cImageFactory->CreateBitmapFromHBITMAP(hbit, NULL, opt, &wicBmp);
+	cImageFactory->CreateFormatConverter(&wicFormatConverter);
+	wicFormatConverter->Initialize(
+		wicBmp.Get()
+		, GUID_WICPixelFormat32bppPBGRA
+		, WICBitmapDitherTypeNone
+		, nullptr
+		, 0.f
+		, WICBitmapPaletteTypeMedianCut
+	);
+
+	m_d2dContext->CreateBitmapFromWicBitmap(wicFormatConverter.Get(), &bitmap);
 	return bitmap;
 }
 
@@ -440,9 +462,6 @@ void ImageManager::DrawCircle(float x, float y, float width)
 	color.a = 0.5f;
 	color.r = 255;
 	color.g = 255;
-
-	D2D1_MATRIX_3X2_F mat;
-	mat = D2D1::Matrix3x2F::Translation(x - width / 2, y - width / 2);
 }
 
 void ImageManager::DrawCircleCamera(float x, float y, float width)
@@ -468,20 +487,14 @@ void ImageManager::DrawCircleCamera(float x, float y, float width)
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
 };
 
-void ImageManager::DrawRect(RECT rt)
+void ImageManager::DrawBlackRect(RECT rt, eLayer layer, float opacity)
 {
-	D2D1_COLOR_F color;
-	color.a = 255;
-	color.r = 255;
-	color.g = 255;
-	color.b = 255;
-
-	D2D1_MATRIX_3X2_F mat;
-	mat = D2D1::Matrix3x2F::Translation(0, 0);
-	m_d2dContext->SetTransform(&mat);
-	m_d2dContext->CreateSolidColorBrush(color, &m_brush);
-
-	m_d2dContext->FillRectangle(D2D1_RECT_F{ (float)rt.left ,(float)rt.top,(float)rt.right,(float)rt.bottom }, (m_brush));
+	m_blackBrush->SetOpacity(opacity);
+	m_d2dContext->SetTarget(m_layer[layer]);
+	m_d2dContext->FillRectangle(D2D1_RECT_F{ (float)rt.left ,(float)rt.top,(float)rt.right,(float)rt.bottom }, (m_blackBrush));
+	m_blackBrush->SetOpacity(1);
+	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
 }
 
 void ImageManager::DrawRectCenter(RECT rt, CImage* img)
@@ -519,10 +532,10 @@ void ImageManager::Begin()
 	m_d2dContext->BeginDraw();
 	for (int i = 0; i < eLayerNumCount; i++)
 	{
-		//m_layer[i]->CopyFromBitmap(&D2D1::Point2U(0, 0), m_layerEmpty, &D2D1::RectU(0, 0, WINSIZE_X, WINSIZE_Y));
-		//m_d2dContext->SetTarget(m_layer[i]);
+		m_layer[i]->CopyFromBitmap(&D2D1::Point2U(0, 0), m_layerEmpty, &D2D1::RectU(0, 0, WINSIZE_X, WINSIZE_Y));
+		m_d2dContext->SetTarget(m_layer[i]);
 		//D2D1_COLOR_F a = D2D1::ColorF::Black;
-	//	m_d2dContext->Clear();
+		m_d2dContext->Clear(NULL);
 	}
 }
 
@@ -594,34 +607,41 @@ void ImageManager::SampleRender(CImage* img, float x, float y, float sizeX, floa
 	ResetTRS();
 }
 
-void ImageManager::CenterRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
+void ImageManager::CenterUIRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
 {
 	D2D1_MATRIX_3X2_F matT, matR, matS;
 
 	if (isReverse == false)
 	{
-		matT = D2D1::Matrix3x2F::Translation((x - img->GetWidth() * sizeX / 2), (y - img->GetHeight() * sizeY / 2));
-		matR = D2D1::Matrix3x2F::Rotation(rot, { x,y });
+		matT = D2D1::Matrix3x2F::Translation
+		(
+			(x - img->GetWidth() * 0.5f),
+			(y - img->GetHeight() *0.5f)
+		);
+		matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetWidth(),(float)img->GetHeight() });
 		matS = D2D1::Matrix3x2F::Scale(sizeX, sizeY);
 	}
 	else
 	{
-		matT = D2D1::Matrix3x2F::Translation((x + img->GetWidth() * sizeX / 2), (y - img->GetHeight() * sizeY / 2));
-		matR = D2D1::Matrix3x2F::Rotation(rot, { x,y });
+		matT = D2D1::Matrix3x2F::Translation
+		(
+			(x + img->GetWidth() * 0.5f), 
+			(y - img->GetHeight() * 0.5f)
+		);
+		matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetWidth(),(float)img->GetHeight() });
 		matS = D2D1::Matrix3x2F::Scale(-sizeX, sizeY);
 	}
 	m_d2dContext->SetTransform((matS * matT * matR));
-	ID2D1BitmapBrush* color;
-	m_d2dContext->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
-	m_d2dContext->CreateBitmapBrush(img->GetBitMap(), &color);
+	m_d2dContext->SetTarget(m_layer[eLayerTop]);
+	m_d2dContext->DrawBitmap(img->GetBitMap(),
+		D2D1::RectF(0, 0, img->GetWidth(), img->GetHeight()),
+		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
 
-	color->SetBitmap(img->GetBitMap());
-	color->SetOpacity(alpha);
-	m_d2dContext->FillOpacityMask(img->GetBitMap(), color, D2D1_OPACITY_MASK_CONTENT_GRAPHICS, D2D1::RectF(0.0f, 0.0f, img->GetWidth(), img->GetHeight()), D2D1::RectF(0.0f, 0.0f, img->GetWidth(), img->GetHeight()));
-	color->Release();
+	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
 }
 
-void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed,float rot, float alpha)
+void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed, float rot, float alpha)
 {
 	float fW = ani->GetFrameWidth() * 0.5f;
 	float fH = ani->GetFrameHeight() * 0.5f;
@@ -642,7 +662,7 @@ void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float rende
 	}
 	m_d2dContext->SetTransform((matS * matR * matT));
 	HRESULT hr = S_OK;
-	m_d2dContext->SetTarget(m_layer[/*layer*/eLayerTop]);
+	m_d2dContext->SetTarget(m_layer[layer]);
 	m_d2dContext->DrawBitmap
 	(
 		img->GetBitMap(),
@@ -680,26 +700,47 @@ void ImageManager::FrameRender(CImage* img, float x, float y, int frameX, int fr
 	color->SetOpacity(alpha);
 }
 
-void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, float scale, float rot, float alpha)
+void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, float scaleX, float scaleY, float rot, float alpha)
 {
 	D2D1_MATRIX_3X2_F matT, matR, matS;
 	matT = D2D1::Matrix3x2F::Translation(((x - img->GetFrameWidth() * 0.5f) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((y - img->GetFrameHeight() * 0.5f) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
-	matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetFrameWidth(),(float)img->GetFrameHeight()});
-	matS = D2D1::Matrix3x2F::Scale(scale*CAMERA->GetScale(), scale*CAMERA->GetScale()/*, { img->GetFrameWidth() * 0.5f,img->GetFrameHeight() * 0.5f }*/);
+	matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetFrameWidth(),(float)img->GetFrameHeight() });
+	matS = D2D1::Matrix3x2F::Scale(scaleX * CAMERA->GetScale(), scaleY * CAMERA->GetScale());
 	if (frameX < 0) frameX = 0;
 	else if (frameX > img->GetMaxFrameX()) frameX = img->GetMaxFrameX();
 	if (frameY < 0) frameY = 0;
 	else if (frameY > img->GetMaxFrameY()) frameY = img->GetMaxFrameY();
 
 	m_d2dContext->SetTransform(matS * matR * matT);
-	m_d2dContext->SetTarget(m_layer[/*layer*/eLayerTop]);
+	m_d2dContext->SetTarget(m_layer[layer]);
 
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
 		D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()),
 		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
 		D2D1::RectF(img->GetFrameWidth() * frameX, img->GetFrameHeight() * frameY, img->GetFrameWidth() * (frameX + 1), img->GetFrameHeight() * (frameY + 1)));
 
-	float a = img->GetFrameWidth();
+	if (KEYMANAGER->isToggleKey(VK_F7))
+		m_d2dContext->DrawRectangle(D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()), m_blackBrush);
+	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
+};
+void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, D2D1_POINT_2F sCenter, float scaleX, float scaleY, float rot, float alpha)
+{
+	D2D1_MATRIX_3X2_F matT, matR, matS;
+	matT = D2D1::Matrix3x2F::Translation(((x - img->GetFrameWidth() * 0.5f) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((y - img->GetFrameHeight() * 0.5f) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
+	matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetFrameWidth(),(float)img->GetFrameHeight() });
+	matS = D2D1::Matrix3x2F::Scale(scaleX * CAMERA->GetScale(), scaleY * CAMERA->GetScale(), sCenter);
+	if (frameX < 0) frameX = 0;
+	else if (frameX > img->GetMaxFrameX()) frameX = img->GetMaxFrameX();
+	if (frameY < 0) frameY = 0;
+	else if (frameY > img->GetMaxFrameY()) frameY = img->GetMaxFrameY();
+
+	m_d2dContext->SetTransform(matS * matR * matT);
+	m_d2dContext->SetTarget(m_layer[layer]);
+	m_d2dContext->DrawBitmap(img->GetBitMap(),
+		D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()),
+		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
+		D2D1::RectF(img->GetFrameWidth() * frameX, img->GetFrameHeight() * frameY, img->GetFrameWidth() * (frameX + 1), img->GetFrameHeight() * (frameY + 1)));
 
 	if (KEYMANAGER->isToggleKey(VK_F7))
 		m_d2dContext->DrawRectangle(D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()), m_blackBrush);
@@ -740,6 +781,11 @@ void ImageManager::ImageLoad()
 	AddTileSheet(eTileSheetKey::tile_jam, L"Resources/Image/Tile/jam.png");
 	AddTileSheet(eTileSheetKey::tile_spectiles, L"Resources/Image/Tile/spectiles.png");
 
+	//Intro
+	AddImage("UI_GamePad", L"Resources/Image/UI/gamepad.png", 1);
+	AddImage("UI_Devolver", L"Resources/Image/UI/devolver.png", 1);
+	AddImage("UI_AN", L"Resources/Image/UI/an.png", 1);
+
 	AddImage("PlayerImageSheet", L"Resources/Image/Tile/player.png", 32, 32);
 	AddImage("BowImageSheet", L"Resources/Image/Tile/bow.png", 32, 32);
 	AddImage("ArrowImageSheet", L"Resources/Image/Tile/arrow.png", 32, 32);
@@ -747,6 +793,15 @@ void ImageManager::ImageLoad()
 	AddImage("YetiShadow", L"Resources/Image/Boss/YETI/yetiShadow.png", 1, 1);
 	AddImage("YetiEffect", L"Resources/Image/Boss/YETI/yetiEffectParticle.png", 9, 2);
 	AddImage("YetiProjectile", L"Resources/Image/Boss/YETI/yetiAttack.png", 4, 3);
+	AddImage("Sludgeheart", L"Resources/Image/Boss/ACIDNERVE/acidnerve.png", 5);
+	AddImage("SludgeheartShadow", L"Resources/Image/Boss/ACIDNERVE/acidnerveShadow.png", 5);
+	AddImage("ColossusBody", L"Resources/Image/Boss/COLOSSUS/colossusBody.png", 1, 1);
+	AddImage("ColossusBodyLight", L"Resources/Image/Boss/COLOSSUS/colossusBodyLight.png", 1, 1);
+	AddImage("ColossusHand", L"Resources/Image/Boss/COLOSSUS/colossusHand.png", 4, 1);
+	AddImage("ColossusHandShadow", L"Resources/Image/Boss/COLOSSUS/colossusHandShadow.png", 4, 1);
+	AddImage("ColossusHandSleep", L"Resources/Image/Boss/COLOSSUS/colossusHandSleep.png", 1, 1);
+	AddImage("ColossusHead", L"Resources/Image/Boss/COLOSSUS/colossusHead.png", 5, 1);
+	AddImage("ColossusSludge", L"Resources/Image/Boss/COLOSSUS/colossusSludge.png", 6, 1);
 
 	m_spectiles = new GImage;
 	m_spectiles->Init("Resources/Image/Tile/spectiles.bmp", 256, 256);

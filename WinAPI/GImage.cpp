@@ -134,14 +134,17 @@ void GImage::TileRender(GImage* tileSheet, vector<vector<int>> tileVector, int t
 	{
 		for (int j = 0; j < _imageInfo->width; j++)
 		{
-			_pixel[i][j] = GetPixel(_imageInfo->hMemDC, i, j);
+			_pixel[i][j] = GetPixel(_imageInfo->hMemDC, j, i);
 		}
 	}
+
+
 
 	float colorR = GetRValue(_pixel[00][00]);
 	float colorG = GetGValue(_pixel[00][00]);
 	float colorB = GetBValue(_pixel[00][00]);
 	cout << "\n충돌 타일 색상 1,1\nR:" << colorR << "\tG:" << colorG << "\tB:" << colorB << endl;
+	_renderImg = new CImage(IMAGEMANAGER->CreateBitmapFromHBit(_imageInfo->hOBit), _imageInfo->width, _imageInfo->height);
 }
 
 void GImage::Render(HDC hdc, int targetX, int targetY, int targetW, int targetH, int cropX, int cropY)
@@ -171,6 +174,7 @@ void GImage::Render(HDC hdc, int targetX, int targetY, int targetW, int targetH,
 		//SRCCOPY: 소스 영역을 대상 영역에 복사한다.
 		BitBlt(hdc, 0, 0, _imageInfo->width, _imageInfo->height, _imageInfo->hMemDC, 0, 0, SRCCOPY);
 	}
+
 }
 
 void GImage::Release()	//release에 문제생김

@@ -38,6 +38,7 @@ public:
 
 	float GetCurrentSceneWidth() ;
 	float GetCurrentSceneHeight();
+	int GetCurrentSceneTileMatSpec(int latitude, int longitude);
 	Camera* GetCamera() { return _camera; }
 
 	COLORREF** GetCurrentScenePixel();

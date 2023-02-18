@@ -1,10 +1,34 @@
 #include "Object.h"
-class Snowball
+
+class PixelCollision;
+class Snowball :public Object
 {
 private:
+	CImage* m_img;
+	float m_angle;
+	float m_speed;
+	float m_imgRot;
+
+	bool m_render;
+	bool m_move;
+
+	PixelCollision* m_pixelCollision;
 
 public:
+	virtual void Init();
+	virtual void Update();
+	virtual void Render();
+	virtual void Release();
 
+	void SetRender();
+	void SetMove(D2D1_POINT_2F playerPos);
+
+	virtual void Attack(eObjectKinds kinds);
+	virtual void Hit(eObjectKinds kinds);
+
+	bool GetIsRender() { return m_render; }
+
+	Snowball(float centerX, float centerY);
 };
 
 class Icicle : public Object
@@ -25,7 +49,7 @@ public:
 	virtual void Release();
 
 	virtual void Attack(eObjectKinds kinds);
-	virtual void Hit(eObjectKinds kinds);	//날 때린놈의 종류에 따라서 다른 반응 보여주기
+	virtual void Hit(eObjectKinds kinds);	
 
 	void Setting(float x, float y, int imgnum);
 

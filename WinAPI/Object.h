@@ -10,6 +10,12 @@ protected:
 	float m_attackRange;	//공격범위
 	D2D1_POINT_2F m_attackCenter;		//공격범위의 중심점
 
+	//현재 타일위도(y축)
+	int m_tileLatitude;		
+	//현재 타일경도(x축)
+	int m_tileLongitude;
+	int m_tileSpec;
+
 	eMoveDirection m_direction;
 
 	bool m_isOnHit;
@@ -45,10 +51,13 @@ public:
 
 
 	void SetKinds(eObjectKinds kinds) { m_kinds = kinds; }
-	void SetPosition(float x, float y) { m_center.x = x; m_center.y = y; }
+	void SetPosition(float x, float y) 
+	{ m_center.x = x; 
+	m_center.y = y; }
 	void SetPosition(D2D1_POINT_2F center) { m_center=center; }
 	void SetPosition(POINT center) { m_center.x = center.x; m_center.y = center.y; }
 	void SetPosition(long x, long y) { m_center.x = x; m_center.y = y; }
+	void CoordSetting();
 
 	//예외처리 안되어있으므로 꼭 숫자자료형만 넣기
 	template<class T>
@@ -69,5 +78,7 @@ public:
 		m_isOnHit(false), m_isOnAttack(false), m_isAlive(true), m_isDelete(false)
 	{
 	}
+	virtual ~Object()
+	{}
 };
 

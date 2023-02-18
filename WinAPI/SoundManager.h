@@ -74,6 +74,7 @@ public:
 	void Update(void);
 
 	void setUp(string key, string fileName, string singer, string album, bool backGround, bool loop);
+	void setUp(string key, string fileName, bool backGround, bool loop);
 	void play(string key, float volume);
 	bool pauseAndResume(string key);
 	bool pauseAndResume(string key, bool paused);
@@ -139,6 +140,9 @@ public:
 			cout << "해당하는 노래가 없다. key : " << key << endl;
 		}
 	}
+
+	void SoundEffectLoad();
+	void BGMLoad();
 
 	SoundManager();
 };

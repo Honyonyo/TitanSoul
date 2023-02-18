@@ -144,6 +144,10 @@
     </ClCompile>
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="CImage.cpp" />
+    <ClCompile Include="Colossus.cpp" />
+    <ClCompile Include="ColossusScene.cpp" />
+    <ClCompile Include="Door.cpp" />
+    <ClCompile Include="Floor.cpp" />
     <ClCompile Include="FrostMountains.cpp" />
     <ClCompile Include="GameData.cpp" />
     <ClCompile Include="GameNode.cpp">
@@ -151,6 +155,7 @@
     </ClCompile>
     <ClCompile Include="GImage.cpp" />
     <ClCompile Include="ImageManager.cpp" />
+    <ClCompile Include="IntroScene.cpp" />
     <ClCompile Include="IWindowMessage.cpp" />
     <ClCompile Include="JsonSaveLoader.cpp" />
     <ClCompile Include="KeyManager.cpp" />
@@ -162,6 +167,7 @@
     <ClCompile Include="Player.cpp" />
     <ClCompile Include="Scene.cpp" />
     <ClCompile Include="SceneManager.cpp" />
+    <ClCompile Include="Sludgeheart.cpp" />
     <ClCompile Include="SludgeheartScene.cpp" />
     <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="StaticEnumMethod.cpp" />
@@ -192,7 +198,11 @@
     </ClInclude>
     <ClInclude Include="Camera.h" />
     <ClInclude Include="CImage.h" />
+    <ClInclude Include="Colossus.h" />
+    <ClInclude Include="ColossusScene.h" />
     <ClInclude Include="CommonMacroFunction.h" />
+    <ClInclude Include="Door.h" />
+    <ClInclude Include="Floor.h" />
     <ClInclude Include="FrostMountains.h" />
     <ClInclude Include="GameData.h" />
     <ClInclude Include="GameNode.h">
@@ -200,6 +210,7 @@
     </ClInclude>
     <ClInclude Include="GImage.h" />
     <ClInclude Include="ImageManager.h" />
+    <ClInclude Include="IntroScene.h" />
     <ClInclude Include="IWindowMessage.h" />
     <ClInclude Include="JsonSaveLoader.h" />
     <ClInclude Include="KeyManager.h" />
@@ -214,6 +225,7 @@
     <ClInclude Include="Scene.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="SingletonBase.h" />
+    <ClInclude Include="Sludgeheart.h" />
     <ClInclude Include="SludgeheartScene.h" />
     <ClInclude Include="SoundManager.h" />
     <ClInclude Include="stdafx.h" />
@@ -230,8 +242,11 @@
     <ResourceCompile Include="WinAPI.rc" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="ColossusMap.json" />
+    <None Include="Floor.json" />
     <None Include="MapSchema.json" />
     <None Include="SlugeheartMap.json" />
+    <None Include="Title.json" />
     <None Include="YetiMap.json" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -29,11 +29,14 @@ protected:
 	tileSheetList mapTileSheetList;
 	vector<tagTile*> m_tileLayerVector;
 	vector<tagTile*>::iterator m_iterTileLayerVector;
+	vector<tagTile*>::iterator m_matTileLayer;
 	GImage* m_collLayer = nullptr;
 	float m_mapsizeX;
 	float m_mapsizeY;
 
+	D2D1_POINT_2F m_playerStartPos;
 	bool isLoaded;	//생성자에서 false로 초기화, Init되면 true로 변경
+	int m_specLayerNumber;
 
 public:
 	virtual HRESULT Init(void) PURE;
@@ -50,6 +53,8 @@ public:
 		mapTileSheetList.insert(make_pair(firstTileNumber, enumKey));
 	}
 
+	virtual D2D1_POINT_2F GetPlayerStartPos(void) { return m_playerStartPos; }
+	virtual int GetMattileSpec(int latitude, int longitude) { return  (*m_matTileLayer)->tile[latitude][longitude]; }
 	virtual COLORREF** GetPixelList(void) { return m_collLayer->_pixel; }
 	virtual float GetMapWidth()
 	{
@@ -70,7 +75,9 @@ public:
 		return this->m_mapsizeY;
 	};
 
-	Scene() : isLoaded(false), m_mapsizeX(NULL), m_mapsizeY(NULL) {}
+	Scene() 
+		: isLoaded(false), m_mapsizeX(NULL), m_mapsizeY(NULL) 
+	{}
 	virtual ~Scene() 
 	{
 		if (m_collLayer != nullptr)
