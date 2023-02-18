@@ -27,6 +27,7 @@ void Yeti::Init()
 	m_pixelCollision->Init();
 
 	GAMEMANAGER->GetBossState(eYeti, &m_isAlive, &m_center, &m_direction);
+	PLAYER->SetSleepOnOff(false);
 
 	SetAnimationFrame();
 	SetStart();
@@ -52,7 +53,7 @@ void Yeti::Update()
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
 
 	SetCollUpdate(prevFrame);
-
+	if (m_action == eDeath) return;
 	//자고있지 않을 때
 	if (!m_isSleep)
 	{
@@ -134,11 +135,12 @@ void Yeti::Update()
 void Yeti::Render()
 {
 	eLayer layer = (m_center.y > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
-	if (m_hitWall)
+	if (!m_hitWall)
 	{
-
+		IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f, 0.75, 0, 0.5);
 	}
-	else { IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f,0.75, 0, 0.5); }
+	else {}
+
 	if (m_direction == eLeft || m_direction == eLeftDown || m_direction == eLeftUp)
 	{
 		IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer, true);
@@ -168,7 +170,9 @@ void Yeti::Hit(eObjectKinds kinds)
 	switch (kinds)
 	{
 	case eArrow:
-		m_isOnHit = true;
+		m_isAlive = false;
+		m_action = eDeath;
+		cout << "예티 사망" << endl;
 		break;
 	default:
 		break;
@@ -177,7 +181,8 @@ void Yeti::Hit(eObjectKinds kinds)
 
 void Yeti::SetPattern()
 {
-	int a = RND->getInt(3);
+	//int a = RND->getInt(3);
+	int a = 2;
 	switch (a)
 	{
 	case 0:
@@ -204,9 +209,8 @@ void Yeti::SetPattern()
 		break;
 	default:
 		cout << "예티 패턴 넣기 실패" << endl;
+		break;
 	}
-	//m_pattern.push(eRolling);
-	//m_pattern.push(eThrow);
 };
 
 void Yeti::SetThrowSnowball()
@@ -431,37 +435,6 @@ void Yeti::SetCollUpdate(int aniIdx)
 		//hitpoint잡아주고, attack off
 		m_isOnAttack = false;
 		m_isOnHit = true;
-		switch (m_direction)
-		{
-		case eRight:
-			m_hitboxCenter.x = m_center.x - 16;
-			m_hitboxCenter.y = m_center.y + 22;
-			break;
-		case eUp:
-			m_hitboxCenter.x = m_center.x;
-			m_hitboxCenter.y = m_center.y + 22;
-			break;
-		case eLeft:
-			m_hitboxCenter.x = m_center.x + 16;
-			m_hitboxCenter.y = m_center.y + 22;
-			break;
-		case eDown:
-		case eRightDown:
-		case eLeftDown:
-			m_isOnHit = false;
-			break;
-		case eLeftUp:
-			m_hitboxCenter.x = m_center.x + 8;
-			m_hitboxCenter.y = m_center.y + 22;
-			break;
-		case eRightUp:
-			m_hitboxCenter.x = m_center.x - 8;
-			m_hitboxCenter.y = m_center.y + 22;
-			break;
-		default:
-			break;
-		}
-
 		break;
 	case eRolling:
 		if (m_isOnRollingLoop)
@@ -477,8 +450,41 @@ void Yeti::SetCollUpdate(int aniIdx)
 	}
 	if (KEYMANAGER->isOnceKeyDown('O'))
 	{
-		cout << "Yeti attackPoint " << m_attackCenter.x << ", " << m_attackCenter.y << endl;
+		cout << "Yeti\nattackPoint " << m_attackCenter.x << ", " << m_attackCenter.y << endl;
 		cout << "range" << m_attackRange << endl;
+		cout << "hitboxPoint " << m_hitboxCenter.x << ", " << m_hitboxCenter.y << endl;
+		cout << "range" << m_hitboxRange << endl;
+	}
+
+	switch (m_direction)
+	{
+	case eRight:
+		m_hitboxCenter.x = m_center.x - 16;
+		m_hitboxCenter.y = m_center.y + 22;
+		break;
+	case eUp:
+		m_hitboxCenter.x = m_center.x;
+		m_hitboxCenter.y = m_center.y + 22;
+		break;
+	case eLeft:
+		m_hitboxCenter.x = m_center.x + 16;
+		m_hitboxCenter.y = m_center.y + 22;
+		break;
+	case eDown:
+	case eRightDown:
+	case eLeftDown:
+		m_isOnHit = false;
+		break;
+	case eLeftUp:
+		m_hitboxCenter.x = m_center.x + 8;
+		m_hitboxCenter.y = m_center.y + 22;
+		break;
+	case eRightUp:
+		m_hitboxCenter.x = m_center.x - 8;
+		m_hitboxCenter.y = m_center.y + 22;
+		break;
+	default:
+		break;
 	}
 };
 

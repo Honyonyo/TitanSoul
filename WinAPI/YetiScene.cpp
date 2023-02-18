@@ -78,5 +78,4 @@ YetiScene::YetiScene()
 };
 YetiScene::~YetiScene()
 {
-	m_yeti->Release();
 };
