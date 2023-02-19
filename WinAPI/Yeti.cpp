@@ -3,6 +3,8 @@
 #include "Animation.h"
 #include "PixelCollision.h"
 #include "YetiProjectile.h"
+#include "BossShield.h"
+
 void Yeti::Init()
 {
 	m_hitboxRange = 62.0f;
@@ -25,6 +27,12 @@ void Yeti::Init()
 
 	m_pixelCollision = new PixelCollision(&m_center, 0, 16, 64, 64);
 	m_pixelCollision->Init();
+
+	m_bossShield = new BossShield;
+	m_bossShield->Setting(this, &m_center, 0, 0, 20);
+	m_bossShield->Init();
+	OBJECTMANAGER->AddObject(m_bossShield);
+
 
 	GAMEMANAGER->GetBossState(eYeti, &m_isAlive, &m_center, &m_direction);
 	PLAYER->SetSleepOnOff(false);
@@ -53,9 +61,10 @@ void Yeti::Update()
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
 
 	SetCollUpdate(prevFrame);
-	if (m_action == eDeath&&!m_animation->IsPlay()) return;
+	if (m_action == eDeath && !m_animation->IsPlay()) return;
+
 	//자고있지 않을 때
-	if (!m_isSleep)
+	if (m_wakeup)
 	{
 		m_isAction = m_animation->IsPlay();
 
@@ -111,12 +120,12 @@ void Yeti::Update()
 	}
 	if (KEYMANAGER->isOnceKeyDown('Q'))
 	{
-		m_isSleep = false;
+		m_wakeup = true;
 	}
-	if (KEYMANAGER->isOnceKeyDown('D'))
-	{
-		m_action = eDeath;
-	}
+	//if (KEYMANAGER->isOnceKeyDown('D'))
+	//{
+	//	m_action = eDeath;
+	//}
 
 	if (prevAction != m_action || prevDirection != m_direction && m_action != eRolling)
 	{
@@ -134,10 +143,10 @@ void Yeti::Update()
 
 void Yeti::Render()
 {
-	eLayer layer = (m_center.y > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
+	eLayer layer = (m_center.y + 48 > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
 	if (!m_hitWall)
 	{
-		IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, layer, 0.75f, 0.75, 0, 0.5);
+		IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x + m_shadow->GetFrameWidth() * 0.125, m_shadowCenter.y, 0, 0, layer, 0.75f, 0.75, 0, 0.5);
 	}
 	else {}
 
@@ -150,6 +159,7 @@ void Yeti::Render()
 
 void Yeti::Release()
 {
+	m_bossShield->ObjectDelete();
 	m_isDelete = true;
 }
 
@@ -175,6 +185,8 @@ void Yeti::Hit(eObjectKinds kinds)
 		m_animation->SetPlayFrame(m_aniIndexArr[m_direction][m_action], false, 0);
 		m_animation->AniStart();
 
+		GAMEMANAGER->SetBossDead(eYeti, m_center, m_direction);
+
 		cout << "예티 사망" << endl;
 		break;
 	default:
@@ -184,8 +196,8 @@ void Yeti::Hit(eObjectKinds kinds)
 
 void Yeti::SetPattern()
 {
-	//int a = RND->getInt(3);
-	int a = 2;
+	int a = RND->getInt(3);
+	//int a = 2;
 	switch (a)
 	{
 	case 0:
@@ -246,7 +258,7 @@ void Yeti::SetReady()
 void Yeti::ThrowSnowball()
 {
 	//프레임이 3번일때 m_render==false 면 SetRender호출(Get함수 만드러야함)
-	if (m_animation->GetNowFrameIdx()==3)
+	if (m_animation->GetNowFrameIdx() == 3)
 	{
 		if (!snowball->GetIsRender())
 		{
@@ -343,6 +355,7 @@ void Yeti::Rolling()
 
 			m_isOnAttack = false;
 			m_hitWall = true;
+			m_bossShield->SetHitboxOnOff(false);
 			m_pixelCollision->ResetColl();
 			m_rollingGravity = 278;
 			m_rollingJumpSpeed = m_rollingDefJumpSpeed;
@@ -371,6 +384,7 @@ void Yeti::Rolling()
 				m_center = m_rollingDest;
 				m_isOnAttack = true;
 				m_hitWall = false;
+				m_bossShield->SetHitboxOnOff(true);
 				m_isOnRollingLoop = false;
 				m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
 				m_animation->AniResume();
@@ -403,27 +417,27 @@ void Yeti::IcicleDrop()
 	}
 	else
 	{
-		slop =  (m_center.y - playerpoint.y) / (m_center.x - playerpoint.x);
+		slop = (m_center.y - playerpoint.y) / (m_center.x - playerpoint.x);
 	}
 	int i = 1;
 	POINT dropCenter = { 8 + (m_center.x) / TILE_SIZE * TILE_SIZE, 8 + (m_center.y / TILE_SIZE) * TILE_SIZE };
 	while (i < 7)
 	{
 
-		dropCenter.x += (tmp +RND->getfloat(1.6)-0.8)* TILE_SIZE;
-		dropCenter.y += (slop+RND->getfloat(1.6) -0.8) * TILE_SIZE * 2;
+		dropCenter.x += (tmp + RND->getfloat(1.6) - 0.8) * TILE_SIZE;
+		dropCenter.y += (slop + RND->getfloat(1.6) - 0.8) * TILE_SIZE * 2;
 		RECT rc = { 0,0,SCENEMANAGER->GetCurrentSceneWidth(), SCENEMANAGER->GetCurrentSceneHeight() };
-		if (!PtInRect(&rc, dropCenter)) 
+		if (!PtInRect(&rc, dropCenter))
 		{
-			i++; continue; 
+			i++; continue;
 		}
 		if (SCENEMANAGER->GetCurrentScenePixel()[dropCenter.x][dropCenter.y] != RGB(0, 0, 0))
 		{
-				break;
+			break;
 		}
-		else 
+		else
 		{
-			OBJECTMANAGER->AddObject<Icicle>()->Setting(dropCenter.x, dropCenter.y, i%3);
+			OBJECTMANAGER->AddObject<Icicle>()->Setting(dropCenter.x, dropCenter.y, i % 3);
 			i++;
 		}
 
@@ -607,24 +621,12 @@ void Yeti::SetStart()
 		m_center = { 496,480 };
 		m_direction = eDown;
 
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eThrow);
-	//	m_pattern.push(eRolling);
-	//	m_pattern.push(eRolling);
-
-		m_pattern.push(eReady);
-		m_pattern.push(eReady);
-		m_pattern.push(eReady);
-		m_pattern.push(eReady);
-		m_pattern.push(eReady);
-		m_pattern.push(eReady);
-
-
-
-
-
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		m_pattern.push(eThrow);
+		m_pattern.push(eRolling);
+		m_pattern.push(eRolling);
 	}
 	m_action = eSit;
 	m_rot = 0; m_rotRad = 0;
@@ -636,8 +638,8 @@ void Yeti::SetStart()
 }
 
 Yeti::Yeti()
-	:m_rollingSpeed(8), m_maxSnowball(4), m_action(eSit),
-	m_isAction(false), m_isSleep(true), m_isOnRollingLoop(false), m_hitWall(false),
+	:m_rollingSpeed(7), m_maxSnowball(4), m_action(eSit),
+	m_isAction(false), m_isOnRollingLoop(false), m_hitWall(false),
 	m_rollingJumpMoveX(0), m_rollingJumpMoveY(0),
 	m_rot(0), m_rotRad(0),
 	m_rollingJumpSpeed(0), m_rollingGravity(0), m_rollingDefJumpSpeed(278),
@@ -646,6 +648,7 @@ Yeti::Yeti()
 	m_direction = eDown;
 	m_isOnHit = false;
 	m_isOnAttack = false;
+	m_wakeup = false;
 	m_kinds = eMonster;
 };
 Yeti::~Yeti()

@@ -48,7 +48,6 @@ private:
 	float m_rot;
 	float m_rotRad;
 	bool m_isAction;
-	bool m_isSleep;
 
 	//롤링관련 변수
 	bool m_isOnRollingLoop; 

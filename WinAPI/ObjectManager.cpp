@@ -49,6 +49,7 @@ void ObjectManager::Update()
 	q.swap(m_vtmpObject);
 
 
+	//##추가 필요 : rectCollision 불값 확인하고 충돌처리 다르게 주기
 	for (auto attack = m_vObject.begin(); attack != m_vObject.end(); attack++)
 	{
 		for (auto hit = m_vObject.begin(); hit != m_vObject.end(); hit++)

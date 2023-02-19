@@ -12,6 +12,8 @@ private:
 	*/
 	string text[5];
 	Yeti* m_yeti;
+	RECT m_floorGate;
+
 public:
 	virtual HRESULT Init(void);
 	virtual void Release(void);

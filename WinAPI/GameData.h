@@ -6,6 +6,7 @@ const static enum eBossList
 {
 	eYeti = 0,
 	eSludgeheart,
+	eColossus,
 
 	eBossListNumCount
 };
@@ -41,6 +42,12 @@ public:
 		}
 	}
 	void SetBossAlive(eBossList boss) { m_bossAlived[boss] = 1; }
+	void SetBossDead(eBossList boss, D2D1_POINT_2F pos, eMoveDirection direction)
+	{
+		m_bossAlived[boss] = 0;
+		m_bossDeadPos[boss] = pos;
+		m_bossDeadDirection[boss] = direction;
+	}
 	void SetBossDead(eBossList boss) { m_bossAlived[boss] = 0; }
 	void SetBossDeadPosition(eBossList boss, float x, float y) { m_bossDeadPos[boss] = { x, y }; }
 	void SetBossDeadPosition(eBossList boss, D2D1_POINT_2F pos) { m_bossDeadPos[boss] = pos; }

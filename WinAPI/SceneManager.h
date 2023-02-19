@@ -28,12 +28,8 @@ public:
 	Scene* addScene(string sceneName, Scene* scene);
 	Scene* addLoadingScene(string loadingSceneName, Scene* scene);
 	
-	HRESULT changeScene(string SceneName);
+	HRESULT changeScene(string SceneName, bool startPosSetting= false, D2D1_POINT_2F startPos = {0,0});
 
-	//로딩만 하는 누군가.
-	//콜백이 곧 델리게이트다...
-	//LPVOID : void* 어떤 타입으로도 변환 가능
-	//friend 단방향참조
 	friend DWORD CALLBACK loadingThread(LPVOID prc);
 
 	float GetCurrentSceneWidth() ;

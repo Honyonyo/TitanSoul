@@ -13,6 +13,7 @@ HRESULT YetiScene::Init(void)
 
 	m_yeti = new Yeti;
 	m_yeti->Init();
+	m_floorGate = RectMakeCenter(496, 912, 32, 64);
 
 	OBJECTMANAGER->AddObject(m_yeti);
 
@@ -30,6 +31,10 @@ void YetiScene::Release(void)
 
 void YetiScene::Update(void)
 {
+	if (PtInRect(&m_floorGate, PLAYER->GetCenterPOINT()))
+	{
+		SCENEMANAGER->changeScene("FloorScene", true, { 800, 1584 });
+	}
 }
 
 void YetiScene::Render(void)
@@ -71,7 +76,7 @@ YetiScene::YetiScene()
 	:m_yeti(nullptr)
 {
 	LoadTile(&m_tileLayerVector, "YetiMap.json");
-	m_playerStartPos = { 496.0f, 912.0f };
+	m_playerStartPos = { 496.0f, 850.0f };
 };
 YetiScene::~YetiScene()
 {

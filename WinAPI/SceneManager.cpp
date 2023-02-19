@@ -88,7 +88,7 @@ Scene* SceneManager::addLoadingScene(string loadingSceneName, Scene* scene)
     return scene;
 }
 
-HRESULT SceneManager::changeScene(string SceneName)
+HRESULT SceneManager::changeScene(string SceneName, bool startPosSetting, D2D1_POINT_2F startPos)
 {
     mapSceneIter find = _mSceneList.find(SceneName);
     
@@ -98,7 +98,14 @@ HRESULT SceneManager::changeScene(string SceneName)
     if (SUCCEEDED(find->second->Init()))
     {
         _currentScene = find->second;
-        PLAYER->SetPosition(_currentScene->GetPlayerStartPos());
+        if (startPosSetting)
+        {
+            PLAYER->SetPosition(startPos);
+        }
+        else
+        {
+            PLAYER->SetPosition(_currentScene->GetPlayerStartPos());
+        }
         _camera->SetMapSize(_currentScene->GetMapWidth(), _currentScene->GetMapHeight());
         cout << "¸Ê ¹Ù²Ù±â. »õ ¸Ê »çÀÌÁî : "<< _currentScene->GetMapWidth() <<", "<< _currentScene->GetMapHeight() <<endl;
         return S_OK;

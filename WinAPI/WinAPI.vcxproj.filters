@@ -187,6 +187,9 @@
     <ClCompile Include="IntroScene.cpp">
       <Filter>Scene</Filter>
     </ClCompile>
+    <ClCompile Include="BossShield.cpp">
+      <Filter>Object\Boss</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMatrix.h">
@@ -318,6 +321,9 @@
     </ClInclude>
     <ClInclude Include="IntroScene.h">
       <Filter>Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="BossShield.h">
+      <Filter>Object\Boss</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

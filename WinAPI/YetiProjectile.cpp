@@ -79,7 +79,7 @@ void Snowball::Hit(eObjectKinds kinds)
 }
 
 Snowball::Snowball(float centerX, float centerY)
-	:m_angle(0),m_speed(5), m_imgRot(0), m_img(nullptr), m_move(false), m_render(false),
+	:m_angle(0),m_speed(4), m_imgRot(0), m_img(nullptr), m_move(false), m_render(false),
 	m_pixelCollision(nullptr)
 {
 	m_isDelete = false;

@@ -136,6 +136,7 @@
     <ClCompile Include="Animation.cpp" />
     <ClCompile Include="Arrow.cpp" />
     <ClCompile Include="Boss.cpp" />
+    <ClCompile Include="BossShield.cpp" />
     <ClCompile Include="C3DMatrix.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
@@ -190,6 +191,7 @@
     <ClInclude Include="Animation.h" />
     <ClInclude Include="Arrow.h" />
     <ClInclude Include="Boss.h" />
+    <ClInclude Include="BossShield.h" />
     <ClInclude Include="C3DMatrix.h">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClInclude>

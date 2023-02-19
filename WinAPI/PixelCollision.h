@@ -16,7 +16,8 @@ private:
 
 	const COLORREF m_collColor[eCollisionSpecNumCount]
 		= 
-	{ RGB(255, 226, 64),	//Wall
+	{ 
+		RGB(255, 226, 64),	//Wall
 		RGB(17,240,150)		//Diagonal
 	};
 	COLORREF** m_pixel;
