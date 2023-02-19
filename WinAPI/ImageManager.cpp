@@ -607,35 +607,37 @@ void ImageManager::SampleRender(CImage* img, float x, float y, float sizeX, floa
 	ResetTRS();
 }
 
-void ImageManager::CenterUIRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
+void ImageManager::CenterUIRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
 {
 	D2D1_MATRIX_3X2_F matT, matR, matS;
+	float fW = img->GetFrameWidth();
+	float fH = img->GetFrameHeight();
 
 	if (isReverse == false)
 	{
 		matT = D2D1::Matrix3x2F::Translation
 		(
-			(x - img->GetWidth() * 0.5f),
-			(y - img->GetHeight() *0.5f)
+			(x - fW * 0.5f * sizeX),
+			(y - fH *0.5f*sizeY)
 		);
-		matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetWidth(),(float)img->GetHeight() });
+		matR = D2D1::Matrix3x2F::Rotation(rot, { fW,fH });
 		matS = D2D1::Matrix3x2F::Scale(sizeX, sizeY);
 	}
 	else
 	{
 		matT = D2D1::Matrix3x2F::Translation
 		(
-			(x + img->GetWidth() * 0.5f), 
-			(y - img->GetHeight() * 0.5f)
+			(x + fW * 0.5f*sizeX), 
+			(y - fH * 0.5f*sizeY)
 		);
-		matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetWidth(),(float)img->GetHeight() });
+		matR = D2D1::Matrix3x2F::Rotation(rot, { fW,fH });
 		matS = D2D1::Matrix3x2F::Scale(-sizeX, sizeY);
 	}
 	m_d2dContext->SetTransform((matS * matT * matR));
 	m_d2dContext->SetTarget(m_layer[eLayerTop]);
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
-		D2D1::RectF(0, 0, img->GetWidth(), img->GetHeight()),
-		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR);
+		D2D1::RectF(0, 0, fW, fH),
+		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, D2D1::RectF(frameX * fW, frameY*fH, (frameX+1)*fW, (frameY+1)*fH));
 
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
 	m_d2dContext->SetTarget(Direct2DBackBuffer);
@@ -785,6 +787,10 @@ void ImageManager::ImageLoad()
 	AddImage("UI_GamePad", L"Resources/Image/UI/gamepad.png", 1);
 	AddImage("UI_Devolver", L"Resources/Image/UI/devolver.png", 1);
 	AddImage("UI_AN", L"Resources/Image/UI/an.png", 1);
+	AddImage("UI_Title", L"Resources/Image/UI/title.png", 1);
+	AddImage("UI_MenuCursur", L"Resources/Image/UI/menuCursur.png", 6);
+	AddImage("UI_Number", L"Resources/Image/UI/number.png", 4);
+	AddImage("UI_Text", L"Resources/Image/UI/fontsmall.png", 32,32);
 
 	AddImage("PlayerImageSheet", L"Resources/Image/Tile/player.png", 32, 32);
 	AddImage("BowImageSheet", L"Resources/Image/Tile/bow.png", 32, 32);

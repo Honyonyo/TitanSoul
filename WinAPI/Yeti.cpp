@@ -21,7 +21,7 @@ void Yeti::Init()
 	m_attackCenter.x = m_center.x;
 	m_attackCenter.y = m_center.y + 16;
 	m_attackRange = 32;
-	m_hitboxRange = 12;
+	m_hitboxRange = 10;
 
 	m_pixelCollision = new PixelCollision(&m_center, 0, 16, 64, 64);
 	m_pixelCollision->Init();
@@ -53,7 +53,7 @@ void Yeti::Update()
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
 
 	SetCollUpdate(prevFrame);
-	if (m_action == eDeath) return;
+	if (m_action == eDeath&&!m_animation->IsPlay()) return;
 	//자고있지 않을 때
 	if (!m_isSleep)
 	{
@@ -172,6 +172,9 @@ void Yeti::Hit(eObjectKinds kinds)
 	case eArrow:
 		m_isAlive = false;
 		m_action = eDeath;
+		m_animation->SetPlayFrame(m_aniIndexArr[m_direction][m_action], false, 0);
+		m_animation->AniStart();
+
 		cout << "예티 사망" << endl;
 		break;
 	default:
@@ -396,7 +399,7 @@ void Yeti::IcicleDrop()
 	float tmp = (m_center.x > playerpoint.x) ? -2 : 2;
 	if (playerpoint.x - m_center.x < TILE_SIZE)
 	{
-		slop = (m_center.x > playerpoint.x) ? -tanf(m_rotRad) : tanf(m_rotRad);
+		slop = 0;
 	}
 	else
 	{
@@ -409,6 +412,11 @@ void Yeti::IcicleDrop()
 
 		dropCenter.x += (tmp +RND->getfloat(1.6)-0.8)* TILE_SIZE;
 		dropCenter.y += (slop+RND->getfloat(1.6) -0.8) * TILE_SIZE * 2;
+		RECT rc = { 0,0,SCENEMANAGER->GetCurrentSceneWidth(), SCENEMANAGER->GetCurrentSceneHeight() };
+		if (!PtInRect(&rc, dropCenter)) 
+		{
+			i++; continue; 
+		}
 		if (SCENEMANAGER->GetCurrentScenePixel()[dropCenter.x][dropCenter.y] != RGB(0, 0, 0))
 		{
 				break;
@@ -432,6 +440,8 @@ void Yeti::SetCollUpdate(int aniIdx)
 	switch (m_action)
 	{
 	case eIdle:
+	case eReady:
+	case eThrow:
 		//hitpoint잡아주고, attack off
 		m_isOnAttack = false;
 		m_isOnHit = true;
@@ -597,12 +607,24 @@ void Yeti::SetStart()
 		m_center = { 496,480 };
 		m_direction = eDown;
 
-		m_pattern.push(eThrow);
-		m_pattern.push(eThrow);
-		m_pattern.push(eThrow);
-		m_pattern.push(eThrow);
-		m_pattern.push(eRolling);
-		m_pattern.push(eRolling);
+	//	m_pattern.push(eThrow);
+	//	m_pattern.push(eThrow);
+	//	m_pattern.push(eThrow);
+	//	m_pattern.push(eThrow);
+	//	m_pattern.push(eRolling);
+	//	m_pattern.push(eRolling);
+
+		m_pattern.push(eReady);
+		m_pattern.push(eReady);
+		m_pattern.push(eReady);
+		m_pattern.push(eReady);
+		m_pattern.push(eReady);
+		m_pattern.push(eReady);
+
+
+
+
+
 	}
 	m_action = eSit;
 	m_rot = 0; m_rotRad = 0;

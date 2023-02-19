@@ -184,7 +184,9 @@
     <ClCompile Include="ColossusScene.cpp">
       <Filter>Scene\Field</Filter>
     </ClCompile>
-    <ClCompile Include="IntroScene.cpp" />
+    <ClCompile Include="IntroScene.cpp">
+      <Filter>Scene</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMatrix.h">
@@ -314,7 +316,9 @@
     <ClInclude Include="ColossusScene.h">
       <Filter>Scene\Field</Filter>
     </ClInclude>
-    <ClInclude Include="IntroScene.h" />
+    <ClInclude Include="IntroScene.h">
+      <Filter>Scene</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinAPI.rc" />

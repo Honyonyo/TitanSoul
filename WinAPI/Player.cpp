@@ -38,7 +38,7 @@ void Player::Init()
 void Player::Update()
 {
 	//플레이어 죽으면 동작 안하기
-	if (!m_isAlive) return;
+	if (!m_isAlive &&  !m_animation->IsPlay()) return;
 	if (m_sleep)return;
 
 	m_aniChange = false;
@@ -141,7 +141,14 @@ void Player::Update()
 
 	if (m_aniChange)
 	{
-		m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][m_state], false, frameIndex);
+		if (m_state == eWalk || m_state == eDash)
+		{
+			m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][m_state], true, frameIndex);
+		}
+		else
+		{
+			m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][m_state], false, frameIndex);
+		}
 		if (!m_animation->IsPlay()) m_animation->AniStart();
 	}
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
@@ -172,6 +179,10 @@ void Player::Hit(eObjectKinds kinds)
 	{
 	case eMonster:
 		m_isAlive = false;
+		m_nonCansleAction = true;
+		m_state = eDeath;
+		m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][eDeath], false, 0);
+		m_animation->AniStart();
 		break;
 	default:
 		NULL;
@@ -365,21 +376,13 @@ void Player::SetAnimationFrame()
 		m_aniIndexArr[1][i][eShotting].push_back(13 + m_animation->GetFrameNumWidth() * i);
 		m_aniIndexArr[1][i][eCall].push_back(14 + m_animation->GetFrameNumWidth() * i);
 		m_aniIndexArr[1][i][eIdle].push_back(i * m_animation->GetFrameNumWidth());
-		m_aniIndexArr[1][i][eRollingSuccess].push_back(i * 72);
-		m_aniIndexArr[1][i][eRollingFail].push_back(i * 71);
-		//for (int j = 0; j < 6; j++)
-		//{
-		//	
-		//}
-		//for (int j = 0; j < 12; j++)
-		//{
-		//	m_aniIndexArr[1][i][eDash].push_back(i * (64) + 8 + j + 64 * 8);
-		//}
+		m_aniIndexArr[1][i][eRollingSuccess].push_back(12 + m_animation->GetFrameNumWidth() * i);
+		m_aniIndexArr[1][i][eRollingFail].push_back(12 + m_animation->GetFrameNumWidth() * i);
+		m_aniIndexArr[1][i][eDeath].push_back(12 + m_animation->GetFrameNumWidth() * i);
 	}
 
 	for (int i = 0; i < m_aniIndexArr[1][eRight][eWalk].size(); i++)
 		m_animation->SetFPS(3);
-	//m_animation->SetPlayFrame(m_aniIndexArr[1][eUp][eIdle]);
 	m_animation->AniStart();
 }
 
@@ -432,7 +435,6 @@ void Player::PlaySoundEffect(int prevAniIdx, int nowAniIdx)
 	case eRolling:
 	{
 		//롤링 사운드 넣기
-		//롤링 모션 넣기
 		if (nowAniIdx == 0)
 		{
 

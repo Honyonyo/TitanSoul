@@ -27,6 +27,7 @@ class Player : public Object
 		eShotting,
 		eCall,
 		eStageClear,
+		eDeath,
 
 		eStateNumber
 	};
