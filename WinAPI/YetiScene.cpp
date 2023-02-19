@@ -44,10 +44,7 @@ void YetiScene::Render(void)
 			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerBg);
 			break;
 		case eFG:	//º® ·»´õ
-			if (KEYMANAGER->isToggleKey(VK_F1))
-			{
-				IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerWall);
-			}
+			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerWall);
 			break;
 		case eCOL:	//Ãæµ¹ ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F2))
@@ -65,7 +62,7 @@ void YetiScene::Render(void)
 		if (KEYMANAGER->isToggleKey(VK_F4))
 		{
 			IMAGEMANAGER->CenterFrameRender(m_collLayer->GetRenderImage(), m_mapsizeX / 2, m_mapsizeY / 2, 0, 0, eLayerUnderPlayer);
-			
+
 		}
 	}
 }
@@ -74,7 +71,7 @@ YetiScene::YetiScene()
 	:m_yeti(nullptr)
 {
 	LoadTile(&m_tileLayerVector, "YetiMap.json");
-	m_playerStartPos = { 496.0f, 450.0f };
+	m_playerStartPos = { 496.0f, 912.0f };
 };
 YetiScene::~YetiScene()
 {

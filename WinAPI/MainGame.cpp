@@ -13,13 +13,11 @@ HRESULT MainGame::Init(void)
 	SCENEMANAGER->addScene("IntroScene", new IntroScene);
 	//SCENEMANAGER->addScene("FrostMountain", new FrostMountains);
 	SCENEMANAGER->addScene("Floor", new Floor);
-	//SCENEMANAGER->addScene("YetiScene", new YetiScene);
-	//SCENEMANAGER->addScene("ColossusScene", new ColossusScene);
+	SCENEMANAGER->addScene("YetiScene", new YetiScene);
 	
-	//SCENEMANAGER->changeScene("Floor");
+	SCENEMANAGER->changeScene("Floor");
 	//SCENEMANAGER->changeScene("YetiScene");
-	//SCENEMANAGER->changeScene("ColossusScene");
-	SCENEMANAGER->changeScene("IntroScene");
+	//SCENEMANAGER->changeScene("IntroScene");
 	OBJECTMANAGER->PlayerInit();
 	
 	return S_OK;

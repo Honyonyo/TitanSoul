@@ -32,7 +32,7 @@ private:
 	//float m_mapsizeY;
 
 	//bool isLoaded;	//생성자에서 false로 초기화, Init되면 true로 변경
-	
+	RECT m_yetiGate;
 	Colossus* m_colossus;
 
 public:

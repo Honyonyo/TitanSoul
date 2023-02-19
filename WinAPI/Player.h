@@ -82,6 +82,7 @@ public:
 
 	float GetMoveSpeed(void) { return m_moveSpeed; }
 	float GetDashSpeed(void) { return m_dashSpeed; }
+	POINT GetCenterPOINT(void) { return { (long)m_center.x, (long)m_center.y }; }
 
 	void SetAnimationFrame();
 	void SetSleepOnOff(bool sleep) { m_sleep = sleep; }

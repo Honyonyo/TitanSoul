@@ -291,6 +291,8 @@ void SoundManager::SoundEffectLoad()
 		setUp(key + "SpecialBodyLand", path + "SpecialBodyLand.ogg", false, false);
 		setUp(key + "SpecialFistLand", path + "SpecialFistLand.ogg", false, false);
 	}
+
+
 }
 
 void SoundManager::BGMLoad()

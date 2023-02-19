@@ -38,7 +38,7 @@ void Player::Init()
 void Player::Update()
 {
 	//플레이어 죽으면 동작 안하기
-	if (!m_isAlive &&  !m_animation->IsPlay()) return;
+	if (!m_isAlive && !m_animation->IsPlay()) return;
 	if (m_sleep)return;
 
 	m_aniChange = false;
@@ -91,10 +91,10 @@ void Player::Update()
 	else if (!m_nonCansleAction)//C안누르거나 구르기상태 아닌 경우에만 MOVE가능
 	{
 		if (m_inGround)
-			Rolling();
-		if (m_state != eRolling && m_state != eRollingFail)
-			Move();
+			if (m_state != eRolling && m_state != eRollingFail)
+				Move();
 	}//end if not 'C'
+	Rolling();
 
 	//C키 떼면 카메라 다시 돌아오기
 	if (KEYMANAGER->isOnceKeyUp('C'))
@@ -150,6 +150,10 @@ void Player::Update()
 			m_animation->SetPlayFrame(m_aniIndexArr[m_inGround][m_direction][m_state], false, frameIndex);
 		}
 		if (!m_animation->IsPlay()) m_animation->AniStart();
+		if (m_state == eRolling)
+			m_animation->SetFPS(6);
+		else
+			m_animation->SetFPS(3);
 	}
 	m_animation->FrameUpdate(TIMEMANAGER->getElapsedTime());
 	PlaySoundEffect(prevAniIndex, m_animation->GetNowFrameIdx());
@@ -227,6 +231,7 @@ void Player::Move()
 	if (KEYMANAGER->isStayKeyDown(VK_UP))
 	{
 		if (!m_pixelCollision->GetTopColl())	m_center.y -= speed;
+		if (m_tileSpec == eTileStaireDown || m_tileSpec == eTileStaireUp) m_center.y += speed / 2;
 		m_directionKey[1] = 1;
 		m_directionKey[3] = 0;
 		m_state = isDash ? eDash : eWalk;
@@ -253,6 +258,7 @@ void Player::Move()
 	if (KEYMANAGER->isStayKeyDown(VK_DOWN))
 	{
 		if (!m_pixelCollision->GetBottomColl()) m_center.y += speed;
+		if (m_tileSpec == eTileStaireDown || m_tileSpec == eTileStaireUp) m_center.y -= speed / 2;
 		m_directionKey[1] = 0;
 		m_directionKey[3] = 1;
 		m_state = isDash ? eDash : eWalk;
@@ -266,52 +272,72 @@ void Player::Move()
 
 void Player::Rolling()
 {
-	if (KEYMANAGER->isOnceKeyDown('X'))
+	if (!m_nonCansleAction)
 	{
-		m_state = eRolling;
-		m_aniChange = true;
-		m_nonCansleAction = true;
+		if (KEYMANAGER->isOnceKeyDown('X'))
+		{
+			m_state = eRolling;
+			m_aniChange = true;
+			m_nonCansleAction = true;
+		}
 	}
 
 	if (m_state == eRolling)
 	{
+		short a = 1;
 		if (m_pixelCollision->GetIsColl())
 		{
 			m_aniChange = true;
-			bool check[2] = { false };
-			for (int i = 0; i < 4; i++)
-			{
-				if (i < 2)
-				{
-					if (m_directionKey[i])
-					{
-						m_directionKey[i] = 0;
-						int tmp = (i + 2) % 4;
-						m_directionKey[tmp] = 1;
-						check[i] = true;
-					}
-				}
-				else if (!check[i - 2])
-				{
-					if (m_directionKey[i])
-					{
-						m_directionKey[i] = 0;
-						int tmp = (i + 2) % 4;
-						m_directionKey[tmp] = 1;
-					}
-				}
-			}//end for
+			m_state = eRollingFail;
+			a = -1;
 		}//end pixcelColl
-		else
+		float speed = a * m_dashSpeed;
+		switch (m_direction)
 		{
-			if (m_directionKey[0])
-				m_center.x -= m_dashSpeed;
-			else if (m_directionKey[2])
-				m_center.x += m_dashSpeed;
-			if (m_directionKey[1])
-				m_center.y -= m_dashSpeed;
-			else if (m_directionKey[3])
-				m_center.y += m_dashSpeed;
+		case eRight:
+			m_center.x += a * m_dashSpeed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y += speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y -= speed;
+			break;
+		case eUp:
+			m_center.y -= speed;
+			if (m_tileSpec == eTileStaireDown || m_tileSpec == eTileStaireUp) m_center.y += speed / 2;
+			break;
+		case eLeft:
+			m_center.x -= speed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y -= speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y += speed;
+			break;
+		case eDown:
+			m_center.y += speed;
+			if (m_tileSpec == eTileStaireDown || m_tileSpec == eTileStaireUp) m_center.y -= speed / 2;
+			break;
+		case eRightDown:
+			m_center.x += speed;
+			m_center.y += speed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y += speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y -= speed;
+			break;
+		case eLeftDown:
+			m_center.x -= speed;
+			m_center.y += speed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y -= speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y += speed;
+			break;
+		case eLeftUp:
+			m_center.x -= speed;
+			m_center.y -= speed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y -= speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y += speed;
+			break;
+		case eRightUp:
+			m_center.x += speed;
+			m_center.y -= speed;
+			if (m_tileSpec == eTileStaireLeft) m_center.y += speed;
+			if (m_tileSpec == eTileStaireRight) m_center.y -= speed;
+			break;
+		default:
+			break;
 		}//end noColl
 	}//end stateRolling
 };
@@ -451,7 +477,7 @@ void Player::PlaySoundEffect(int prevAniIdx, int nowAniIdx)
 
 Player::Player() :
 	m_moveSpeed(0.5),
-	m_dashSpeed(1),
+	m_dashSpeed(0.8),
 	m_aniChange(false),
 	m_nonCansleAction(false),
 	m_inGround(true),

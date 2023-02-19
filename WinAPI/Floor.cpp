@@ -15,7 +15,7 @@ HRESULT Floor::Init(void)
 	m_colossus->Init();
 	m_colossus->SetPosition(800.f + 8, 896.f - TILE_SIZE);
 	OBJECTMANAGER->AddObject(m_colossus);
-
+	m_yetiGate=RectMakeCenter(800, 1584, 32, 64);
 
     return S_OK;
 }
@@ -26,6 +26,10 @@ void Floor::Release(void)
 
 void Floor::Update(void)
 {
+	if (PtInRect(&m_yetiGate, PLAYER->GetCenterPOINT()))
+	{
+		SCENEMANAGER->changeScene("YetiScene");
+	}
 }
 
 void Floor::Render(void)
@@ -40,11 +44,10 @@ void Floor::Render(void)
 			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2+ TILE_SIZE, m_mapsizeY / 2+ TILE_SIZE, 0, 0, eLayerBg);
 			break;
 		case eWall:
+			//IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2 + TILE_SIZE, m_mapsizeY / 2 + TILE_SIZE, 0, 0, eLayerWall);
+			//break;
 		case eFG:	//º® ·»´õ
-			if (KEYMANAGER->isToggleKey(VK_F1))
-			{
-				IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2 + TILE_SIZE, m_mapsizeY / 2 + TILE_SIZE, 0, 0, eLayerWall);
-			}
+			IMAGEMANAGER->CenterFrameRender((*m_iterTileLayerVector)->layerImage, m_mapsizeX / 2+ TILE_SIZE, m_mapsizeY / 2+ TILE_SIZE, 0, 0, eLayerWall);
 			break;
 		case eCOL:	//Ãæµ¹ ·»´õ
 			if (KEYMANAGER->isToggleKey(VK_F2))
@@ -66,8 +69,9 @@ Floor::Floor()
 {
 	LoadTile(&m_tileLayerVector, "Floor.json");
 
-	//m_playerStartPos = { 800.0f, 3296.0f };
-	m_playerStartPos = { 800.0f, 1000.0f };
+	PLAYER->SetSleepOnOff(false);
+	m_playerStartPos = { 808.0f, 3288.0f };
+	//m_playerStartPos = { 800.0f, 1000.0f };
 }
 
 Floor::~Floor()
