@@ -12,10 +12,10 @@ HRESULT ColossusScene::Init(void)
 	}
 
 	m_colossus = new Colossus;
+	m_colossus->SetActionScene();
 	m_colossus->Init();
-	m_colossus->SetPosition(480.f, 288.f);
 	OBJECTMANAGER->AddObject(m_colossus);
-
+	PLAYER->SetPosition(PLAYER->GetPointF().x - 320, PLAYER->GetPointF().y - 642);
 	return S_OK;
 }
 

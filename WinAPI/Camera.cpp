@@ -2,8 +2,8 @@
 #include "Camera.h"
 Camera::Camera(float scale) :
 	m_camRot(0.f),
-	m_scaleIncrease(false), m_move(false), m_moveSpeed(0.f),
-	m_shaking(false), m_shakingLv(0)
+	m_scaleIncrease(false), m_moveToRT(false), m_moving(false), m_moveSpeed(0.f),
+	m_shakingLeft(false), m_shaking(false), m_shakingSpeed(1.f), m_shakingLv(0), m_shakeChange(0)
 {
 	m_camScale = scale;
 	m_camWidth = WINSIZE_X / scale;
@@ -19,55 +19,6 @@ Camera::~Camera()
 {
 }
 
-void Camera::SetRenderT()
-{
-	m_camWidth = WINSIZE_X / m_camScale;
-	m_camHeight = WINSIZE_Y / m_camScale;
-
-	//흔들림, 이동같은 특별한 효과가 있지 않은 경우와 일반적인 경우를 나눠야함
-	//맵 사이즈가 카메라 사이즈보다 작을 경우 , 클경우를 나눠서 해야함
-	//가로 세로 나눠서
-
-	if (!m_move)
-	{//가로 T위치 잡기
-		if (m_mapWidth < m_camWidth)	//맵사이즈보다 카메라사이즈(화면출력너비)가 넓은 경우
-		{
-			m_renderT_2F.x = -(m_camWidth - m_mapWidth) / 2;
-		}
-		else//일반적인 경우
-		{
-			m_renderT_2F.x = m_centerP_2F.x - (m_camWidth / 2);
-			//캠이 맵에서 벗어난 경우
-			if (m_renderT_2F.x < 0) m_renderT_2F.x = 0;
-			else if (m_renderT_2F.x + m_camWidth > m_mapWidth) m_renderT_2F.x = m_mapWidth - m_camWidth;
-		}
-
-		//세로 T위치 잡기
-		if (m_mapHeight < m_camHeight)		//맵 사이즈보다 카메라사이즈(화면출력높이)가 더 긴 경우
-		{
-			m_renderT_2F.y = -(m_mapHeight - m_camHeight) / 2;
-		}
-		else
-		{
-			m_renderT_2F.y = m_centerP_2F.y - m_camHeight / 2;
-			//캠이 맵에서 벗어난 경우
-			if (m_renderT_2F.y < 0) m_renderT_2F.y = 0;
-			else if (m_renderT_2F.y + m_camHeight > m_mapHeight)
-				m_renderT_2F.y = m_mapHeight - m_camHeight;
-		}
-	}//end if not camera move
-	else//카메라 무브가 들어갈 경우
-	{
-		m_renderT_2F = { m_centerP_2F.x - m_camWidth / 2, m_centerP_2F.y - m_camHeight / 2 };
-	}
-
-	if (m_shaking)
-	{
-		//##
-	}
-
-}
-
 void Camera::Init()
 {
 	//if (m_mapWidth == NULL)m_mapWidth = SCENEMANAGER->GetCurrentSceneWidth();
@@ -78,9 +29,6 @@ void Camera::Init()
 
 void Camera::Update()
 {
-	if (!m_move)
-		SetCenter(PLAYER->GetPointF());
-
 	if (m_scaleIncrease)
 	{
 		m_camScale += 0.008;
@@ -88,7 +36,6 @@ void Camera::Update()
 		{
 			m_camScale = IMAGE_SCALE * 1.2;
 		}
-	//	cout << m_camScale << endl;
 	}
 
 	else if (m_camScale > IMAGE_SCALE)
@@ -100,7 +47,17 @@ void Camera::Update()
 		}
 	}
 
+	if (KEYMANAGER->isOnceKeyDown('I'))
+	{
+		SetCameraShaking(true, 2, 20);
+	}
+	if (KEYMANAGER->isOnceKeyDown('U'))
+	{
+		SetCameraShaking(false, 0);
+	}
 
+	SetCameraCenter();
+	SetShaking();
 	SetRenderT();
 }
 void Camera::Release()
@@ -110,4 +67,122 @@ void Camera::Release()
 void Camera::Render()
 {
 
+}
+
+
+void Camera::SetRenderT()
+{
+	m_camWidth = WINSIZE_X / m_camScale;
+	m_camHeight = WINSIZE_Y / m_camScale;
+
+	//흔들림, 이동같은 특별한 효과가 있지 않은 경우와 일반적인 경우를 나눠야함
+	//맵 사이즈가 카메라 사이즈보다 작을 경우 , 클경우를 나눠서 해야함
+	//가로 세로 나눠서
+
+		//가로 T위치 잡기
+	if (m_mapWidth < m_camWidth)	//맵사이즈보다 카메라사이즈(화면출력너비)가 넓은 경우
+	{
+		m_renderT_2F.x = -(m_camWidth - m_mapWidth) / 2;
+	}
+	else//일반적인 경우
+	{
+		m_renderT_2F.x = m_centerP_2F.x - (m_camWidth / 2);
+		//캠이 맵에서 벗어난 경우
+		if (m_renderT_2F.x < 0) m_renderT_2F.x = 0;
+		else if (m_renderT_2F.x + m_camWidth > m_mapWidth) m_renderT_2F.x = m_mapWidth - m_camWidth;
+	}
+
+	//세로 T위치 잡기
+	if (m_mapHeight < m_camHeight)		//맵 사이즈보다 카메라사이즈(화면출력높이)가 더 긴 경우
+	{
+		m_renderT_2F.y = -(m_mapHeight - m_camHeight) / 2;
+	}
+	else
+	{
+		m_renderT_2F.y = m_centerP_2F.y - m_camHeight / 2;
+		//캠이 맵에서 벗어난 경우
+		if (m_renderT_2F.y < 0) m_renderT_2F.y = 0;
+		else if (m_renderT_2F.y + m_camHeight > m_mapHeight)
+			m_renderT_2F.y = m_mapHeight - m_camHeight;
+	}
+}
+
+void Camera::SetCameraCenter()
+{
+	if (m_moveToRT)
+	{
+		if (m_moving)
+		{
+			if (m_centerP_2F.x != m_moveTarget.x
+				&& m_centerP_2F.y != m_moveTarget.y)
+			{
+				if (MY_UTIL::getDistance(m_centerP_2F.x, m_centerP_2F.y, m_moveTarget.x, m_moveTarget.y) < m_moveSpeed)
+				{
+					SetCenter(m_moveTarget);
+					m_moving = false;
+				}
+				else
+				{
+					float angle = MY_UTIL::getAngle(m_centerP_2F.x, m_centerP_2F.y, m_moveTarget.x, m_moveTarget.y);
+					m_centerP_2F.x += cosf(angle);
+					m_centerP_2F.y -= sinf(angle);
+				}
+			}
+			else m_moving = false;
+		}//end moving
+		else
+		{
+			SetCenter(m_moveTarget);
+		}
+	}
+	//movTRT꺼져있어도 moving인 경우 카메라 위치 확인해서 캐릭터로 옮겨주기
+	else
+	{
+		if (m_moving)
+		{
+			if (m_centerP_2F.x != PLAYER->GetPointF().x
+				&& m_centerP_2F.y != PLAYER->GetPointF().y)
+			{
+				if (MY_UTIL::getDistance(m_centerP_2F.x, m_centerP_2F.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y) < m_moveSpeed)
+				{
+					SetCenter(PLAYER->GetPointF());
+					m_moving = false;
+				}
+				else
+				{
+					float angle = MY_UTIL::getAngle(m_centerP_2F.x, m_centerP_2F.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y);
+					m_centerP_2F.x += cosf(angle);
+					m_centerP_2F.y -= sinf(angle);
+				}
+			}
+			else m_moving = false;
+		}
+		//moving
+		else
+		{
+			SetCenter(PLAYER->GetPointF());
+		}
+	}
+
+	if (KEYMANAGER->isOnceKeyDown('C') || KEYMANAGER->isOnceKeyDown('P'))
+	{
+		printf("카메라좌표 %f, %f\n", m_centerP_2F.x, m_centerP_2F.y);
+	}
+}
+
+void Camera::SetShaking()
+{
+	if (!m_shaking) return;
+	if (m_shakingLeft)
+	{
+		m_shakeChange -= m_shakingLv * m_shakingSpeed * DELTA_TIME;
+		if (m_shakeChange <= -m_shakingLv) m_shakingLeft = false;
+	}
+	else
+	{
+		m_shakeChange += m_shakingLv * m_shakingSpeed * DELTA_TIME;
+		if (m_shakeChange >= m_shakingLv) m_shakingLeft = true;
+
+	}
+	m_centerP_2F.x += m_shakeChange;
 }

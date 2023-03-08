@@ -72,6 +72,7 @@ void Player::Update()
 	{
 		m_nonCansleAction = true;
 		CAMERA->SetScaleIncease(true);
+		CAMERA->SetCameraMove({ m_center.x + 40, m_center.y + 40 }, true);
 		if (m_arrow->GetIsShooted())
 		{
 			m_state = eCall;
@@ -91,7 +92,7 @@ void Player::Update()
 	else if (!m_nonCansleAction)//C안누르거나 구르기상태 아닌 경우에만 MOVE가능
 	{
 		if (m_inGround)
-			if (m_state != eRolling && m_state != eRollingFail)
+			//if (m_state != eRolling && m_state != eRollingFail)
 				Move();
 	}//end if not 'C'
 	Rolling();
@@ -100,6 +101,7 @@ void Player::Update()
 	if (KEYMANAGER->isOnceKeyUp('C'))
 	{
 		CAMERA->SetScaleIncease(false);
+		CAMERA->SetCameraMove(m_center, false);
 
 		if (m_arrow->GetIsDrawed())
 		{
@@ -163,7 +165,7 @@ void Player::Update()
 void Player::Render()
 {
 	//그림자 렌더
-	//IMAGEMANAGER->CenterFrameRender(m_Image, );
+	IMAGEMANAGER->CenterFrameRender(m_Image, m_center.x, m_center.y + 7, 63, 1, eLayerShadow, 1, 1, 0, 0.5);
 
 	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation, eLayerPlayer);
 	IMAGEMANAGER->CenterAniRender(m_bowImage, m_center.x, m_center.y, m_animation, eLayerPlayer);

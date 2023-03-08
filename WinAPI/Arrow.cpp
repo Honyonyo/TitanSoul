@@ -59,11 +59,11 @@ void Arrow::Render()
 	eLayer layer;
 	if (m_direction == eLeftUp || m_direction == eUp || m_direction == eRightUp)
 		layer = eLayerUnderPlayer;
-	else layer = eLayerUpperPlayer;
+	else layer = eLayerPlayer;
 	//활시위 당길때
 	if (m_isDrawed)
 	{
-		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,1,1,m_rot);
+		IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer, 1, 1, m_rot);
 	}
 	//활시위 안당길 때 (분기 쏘았는가 아닌가로 나뉨)
 	else
@@ -74,7 +74,7 @@ void Arrow::Render()
 		}
 		else
 		{
-			IMAGEMANAGER->CenterAniRender(m_image, m_playerCenter->x, m_playerCenter->y, m_playerAnimation, layer);
+			IMAGEMANAGER->CenterAniRender(m_image, m_playerCenter->x, m_playerCenter->y, m_playerAnimation, eLayerPlayer);
 		}
 	}
 
@@ -132,7 +132,7 @@ void Arrow::Move()
 		m_center.x += m_speed * cosf(m_rotRadian);
 		m_center.y += m_speed * sinf(m_rotRadian);
 		m_speed = (m_speed < 0) ? 0 : m_speed - DELTA_TIME * 10;
-		cout << "화살 중심점 " << m_center.x << ", " << m_center.y << endl;
+	//	cout << "화살 중심점 " << m_center.x << ", " << m_center.y << endl;
 	}
 	else
 	{

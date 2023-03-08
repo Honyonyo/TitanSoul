@@ -28,11 +28,17 @@ void Yeti::Init()
 	m_pixelCollision = new PixelCollision(&m_center, 0, 16, 64, 64);
 	m_pixelCollision->Init();
 
-	m_bossShield = new BossShield;
-	m_bossShield->Setting(this, &m_center, 0, 0, 20);
-	m_bossShield->Init();
-	OBJECTMANAGER->AddObject(m_bossShield);
-
+	m_bossShield = new BossShield*[4];
+	for (int i = 0; i < m_shieldNum; i++)
+	{
+		m_bossShield[i] = new BossShield;
+		m_bossShield[i]->Init();
+		OBJECTMANAGER->AddObject(m_bossShield[i]);
+	}
+	m_bossShield[0]->Setting(this, &m_center, 0, 0, 16);
+	m_bossShield[1]->Setting(this, &m_center, 0, 4, 16);
+	m_bossShield[2]->Setting(this, &m_center, -10, 0, 24);
+	m_bossShield[3]->Setting(this, &m_center, 10, 0, 24);
 
 	GAMEMANAGER->GetBossState(eYeti, &m_isAlive, &m_center, &m_direction);
 	PLAYER->SetSleepOnOff(false);
@@ -122,14 +128,16 @@ void Yeti::Update()
 	{
 		m_wakeup = true;
 	}
-	//if (KEYMANAGER->isOnceKeyDown('D'))
-	//{
-	//	m_action = eDeath;
-	//}
+	if (KEYMANAGER->isOnceKeyDown('D'))
+	{
+		m_action = eDeath;
+	}
 
 	if (prevAction != m_action || prevDirection != m_direction && m_action != eRolling)
 	{
 		m_animation->SetPlayFrame(m_aniIndexArr[m_direction][m_action], false, 0);
+		if (m_action == eDeath)
+			m_animation->SetFPS(3);
 		m_animation->AniStart();
 	}
 
@@ -144,22 +152,35 @@ void Yeti::Update()
 void Yeti::Render()
 {
 	eLayer layer = (m_center.y + 48 > PLAYER->GetPointF().y) ? eLayerUpperPlayer : eLayerUnderPlayer;
-	if (!m_hitWall)
-	{
-		IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x + m_shadow->GetFrameWidth() * 0.125, m_shadowCenter.y, 0, 0, layer, 0.75f, 0.75, 0, 0.5);
-	}
-	else {}
-
+	//예티
 	if (m_direction == eLeft || m_direction == eLeftDown || m_direction == eLeftUp)
 	{
 		IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer, true);
 	}
 	else { IMAGEMANAGER->CenterAniRender(m_sprite, m_center.x, m_center.y, m_animation, layer); }
+
+	//그림자
+	if (m_action == eDeath && m_animation->GetNowFrameIdx() != 0)
+	{
+		//direction별 좌표계산 필요##
+		IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_center.y + 20, 0, 0, eLayerShadow, 1.f, 1.f, 0, 0.5);
+	}
+	else
+	{
+		if (!m_hitWall)
+		{
+			IMAGEMANAGER->CenterFrameRender(m_shadow, m_shadowCenter.x, m_shadowCenter.y, 0, 0, eLayerShadow, 0.75f, 0.75, 0, 0.5);
+		}
+		else {}
+	}
 }
 
 void Yeti::Release()
 {
-	m_bossShield->ObjectDelete();
+	for (int i = 0; i < 4; i++)
+	{
+		m_bossShield[i]->ObjectDelete();
+	}
 	m_isDelete = true;
 }
 
@@ -355,7 +376,7 @@ void Yeti::Rolling()
 
 			m_isOnAttack = false;
 			m_hitWall = true;
-			m_bossShield->SetHitboxOnOff(false);
+			SetCollOnOff(false);
 			m_pixelCollision->ResetColl();
 			m_rollingGravity = 278;
 			m_rollingJumpSpeed = m_rollingDefJumpSpeed;
@@ -379,15 +400,18 @@ void Yeti::Rolling()
 			//if (m_center.x - m_rollingDest.x < 5 && m_center.x - m_rollingDest.x>5)
 
 				//center점이 착지 목표점에 도착하면 m_hitWall을 끄고 Rolling마지막 프레임으로 돌린다. + 타격on, hitWall false
-			if (MY_UTIL::getDistance(m_center.x, m_center.y, m_rollingDest.x, m_rollingDest.y) < 3)
+			if (m_rollingJumpSpeed < 0)
 			{
-				m_center = m_rollingDest;
-				m_isOnAttack = true;
-				m_hitWall = false;
-				m_bossShield->SetHitboxOnOff(true);
-				m_isOnRollingLoop = false;
-				m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
-				m_animation->AniResume();
+				if (MY_UTIL::getDistance(m_center.x, m_center.y, m_rollingDest.x, m_rollingDest.y) < 3)
+				{
+					m_center = m_rollingDest;
+					m_isOnAttack = true;
+					m_hitWall = false;
+					SetCollOnOff(true);
+					m_isOnRollingLoop = false;
+					m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
+					m_animation->AniResume();
+				}
 			}
 			m_shadowCenter.x += m_rollingJumpMoveX * DELTA_TIME;
 			m_shadowCenter.y += m_rollingJumpMoveY * DELTA_TIME;
@@ -451,6 +475,60 @@ void Yeti::Ready(int prevFrame)
 
 void Yeti::SetCollUpdate(int aniIdx)
 {
+
+	//0머리 1몸통 2왼어개 3오른어깨
+	//방향별로 shield 다름
+	//rolling만 센터통합이므로 이후 action스위치에서 다시 보정
+
+	switch (m_direction)
+	{
+	case eRight:
+		m_bossShield[0]->Setting(10, -6);
+		m_bossShield[1]->Setting(-3, 1);
+		m_bossShield[2]->Setting(0, -3);
+		m_bossShield[3]->Setting(0, -3);
+		break;
+	case eLeft:
+		m_bossShield[0]->Setting(-10, -6);
+		m_bossShield[1]->Setting(+3, 1);
+		m_bossShield[2]->Setting(0, -3);
+		m_bossShield[3]->Setting(0, -3);
+		break;
+	case eUp:
+	case eDown:
+		m_bossShield[0]->Setting(-3, -7);
+		m_bossShield[1]->Setting(-3, 1);
+		m_bossShield[2]->Setting(-13, -3);
+		m_bossShield[3]->Setting(7, -3);
+		break;
+	case eRightDown:
+		m_bossShield[0]->Setting(5, -5);
+		m_bossShield[1]->Setting(-3, 1);
+		m_bossShield[2]->Setting(-9, -3);
+		m_bossShield[3]->Setting(7, -6);
+		break;
+	case eLeftDown:
+		m_bossShield[0]->Setting(-5, -5);
+		m_bossShield[1]->Setting(+3, 1);
+		m_bossShield[2]->Setting(+9, -3);
+		m_bossShield[3]->Setting(-7, -6);
+		break;
+	case eLeftUp:
+		m_bossShield[0]->Setting(0, -5);
+		m_bossShield[1]->Setting(+3, 1);
+		m_bossShield[2]->Setting(+8, -5);
+		m_bossShield[3]->Setting(-2, -3);
+		break;
+	case eRightUp:
+		m_bossShield[0]->Setting(0, -5);
+		m_bossShield[1]->Setting(-3, 1);
+		m_bossShield[2]->Setting(-8, -5);
+		m_bossShield[3]->Setting(2, -3);
+		break;
+	default:
+		break;
+	}
+
 	switch (m_action)
 	{
 	case eIdle:
@@ -468,6 +546,7 @@ void Yeti::SetCollUpdate(int aniIdx)
 
 			m_attackCenter.x = m_center.x;
 			m_attackCenter.y = m_center.y + 16;
+			m_bossShield[0]->Setting(0, 0);
 		}
 		break;
 	default: m_isOnAttack = false;
@@ -510,8 +589,7 @@ void Yeti::SetCollUpdate(int aniIdx)
 	default:
 		break;
 	}
-};
-
+}
 
 void Yeti::SetAnimationFrame()
 {
@@ -620,6 +698,7 @@ void Yeti::SetStart()
 	{
 		m_center = { 496,480 };
 		m_direction = eDown;
+		m_action = eSit;
 
 		m_pattern.push(eThrow);
 		m_pattern.push(eThrow);
@@ -628,10 +707,9 @@ void Yeti::SetStart()
 		m_pattern.push(eRolling);
 		m_pattern.push(eRolling);
 	}
-	m_action = eSit;
 	m_rot = 0; m_rotRad = 0;
 	m_isAction = false;
-	m_animation->SetPlayFrame(m_aniIndexArr[eDown][eSit]);
+	m_animation->SetPlayFrame(m_aniIndexArr[m_direction][m_action], false, (int)(m_isAlive ? 0 : 2));
 
 	m_shadowCenter.x = m_center.x;
 	m_shadowCenter.y = m_center.y + 45;
@@ -649,6 +727,7 @@ Yeti::Yeti()
 	m_isOnHit = false;
 	m_isOnAttack = false;
 	m_wakeup = false;
+	m_shieldNum = 4;
 	m_kinds = eMonster;
 };
 Yeti::~Yeti()

@@ -7,7 +7,6 @@ protected:
 
 	typedef vector<vector<int>> tileVector;
 	typedef map<int, eTileSheetKey> tileSheetList;
-
 	struct tagTile
 	{
 		tileVector tile;
@@ -29,7 +28,7 @@ protected:
 	tileSheetList mapTileSheetList;
 	vector<tagTile*> m_tileLayerVector;
 	vector<tagTile*>::iterator m_iterTileLayerVector;
-	vector<tagTile*>::iterator m_matTileLayer;
+	vector<tagTile*>::iterator m_matTileLayer; //타일시트중 매트타일 레이어만을 가리킬 이터레이터.
 	GImage* m_collLayer = nullptr;
 	float m_mapsizeX;
 	float m_mapsizeY;

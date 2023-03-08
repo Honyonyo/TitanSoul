@@ -1,10 +1,12 @@
 #pragma once
 #include "Object.h"
-class BossShield;
+#include "BossShield.h"
+
 class Boss : public Object
 {
 protected:
-	BossShield* m_bossShield;
+	BossShield** m_bossShield;
+	int m_shieldNum;
 	bool m_wakeup;
 
 public:
@@ -15,6 +17,8 @@ public:
 
 	virtual void Attack(eObjectKinds kinds) PURE;
 	virtual void Hit(eObjectKinds kinds) PURE;
+
+	void SetCollOnOff(bool onoff);
 
 	void SetWakeUp() { m_wakeup = true; }
 };

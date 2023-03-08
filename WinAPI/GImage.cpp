@@ -81,20 +81,6 @@ HRESULT GImage::Init(string path, float width, float height)
 
 void GImage::TileRender(GImage* tileSheet, vector<vector<int>> tileVector, int tileStartNum)
 {
-	//for (int i = 0; i < 256; i++)
-	//{
-	//	for (int j = 0; j < 256; j++)
-	//	{
-	//		COLORREF color = GetPixel(tileSheet->_imageInfo->hMemDC, i, j);
-	//		int colorR = GetRValue(color);
-	//		int colorG = GetGValue(color);
-	//		int colorB = GetBValue(color);
-	//
-	//		printf("ÁÂÇ¥ %d,%d »ö»ó %d,%d,%d\n", i, j, colorR, colorG, colorB);
-	//	}
-	//}
-
-
 	int tileLineMaxNumber = tileSheet->GetWidth() / TILE_SIZE;
 	for (int low = 0; low < tileVector.size(); low++)
 	{
@@ -137,8 +123,6 @@ void GImage::TileRender(GImage* tileSheet, vector<vector<int>> tileVector, int t
 			_pixel[i][j] = GetPixel(_imageInfo->hMemDC, j, i);
 		}
 	}
-
-
 
 	float colorR = GetRValue(_pixel[00][00]);
 	float colorG = GetGValue(_pixel[00][00]);

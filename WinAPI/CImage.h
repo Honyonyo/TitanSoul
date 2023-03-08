@@ -50,8 +50,8 @@ public:
 	int   GetHeight() { return height; }
 	int   GetMaxFrameX() { return maxFrameX; }
 	int   GetMaxFrameY() { return maxFrameY; }
-	int   GetFrameWidth() { return frameWidth; }
-	int   GetFrameHeight() { return frameHeight; }
+	float   GetFrameWidth() { return frameWidth; }
+	float   GetFrameHeight() { return frameHeight; }
 
 	void SetAlpha(float a) { alpha = a; }
 	ID2D1Bitmap1* GetBitMap() { return bitmap; }

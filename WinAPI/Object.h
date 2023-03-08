@@ -47,9 +47,10 @@ public:
 	bool GetIsOnAttack() { return m_isOnAttack; }
 	D2D1_POINT_2F GetHitboxCenter(){ return m_hitboxCenter; }
 	D2D1_POINT_2F GetAttackCenter(){ return m_attackCenter; }
+	bool GetIsAlive() { return m_isAlive; }
 	bool GetIsDelete() { return m_isDelete; }
 
-
+	
 	void SetKinds(eObjectKinds kinds) { m_kinds = kinds; }
 	void SetPosition(float x, float y) 
 	{ m_center.x = x; 

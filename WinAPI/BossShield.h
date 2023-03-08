@@ -27,6 +27,11 @@ public:
 		m_hitboxRange = range;
 		m_hitboxCenter = *center;
 	};
+	void Setting(float centerDistanceX, float centerDistanceY)
+	{
+		m_centerDistanceX = centerDistanceX;
+		m_centerDistanceY = centerDistanceY;
+	}
 
 	BossShield();
 	~BossShield();

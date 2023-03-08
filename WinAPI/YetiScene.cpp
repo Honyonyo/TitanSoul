@@ -31,7 +31,7 @@ void YetiScene::Release(void)
 
 void YetiScene::Update(void)
 {
-	if (PtInRect(&m_floorGate, PLAYER->GetCenterPOINT()))
+	if (PtInRect(&m_floorGate, PLAYER->GetPoint()))
 	{
 		SCENEMANAGER->changeScene("FloorScene", true, { 800, 1584 });
 	}

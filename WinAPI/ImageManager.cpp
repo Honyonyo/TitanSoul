@@ -410,8 +410,15 @@ CImage* ImageManager::AddTileLayerImage(map<int, eTileSheetKey> tileFirstgrid, v
 			tileColumn = (tileNumber - iterTile->first) - (tileLow * tileLineMaxNumber);
 
 			D2D1_POINT_2U point = { (column - 1) * TILE_SIZE, (low - 1) * TILE_SIZE };
-			bitmap->CopyFromBitmap(&point, m_tileImageList[iterTile->second]->GetBitMap(), &D2D1::RectU(tileColumn * TILE_SIZE, tileLow * TILE_SIZE, (tileColumn + 1) * TILE_SIZE, (tileLow + 1) * TILE_SIZE));
-			//bitmap->CopyFromBitmap(&D2D1::Point2U((column - 1) * TILE_SIZE, (low - 1) * TILE_SIZE), m_tileImageList[iterTile->second]->GetBitMap(), &D2D1::RectU(tileColumn * TILE_SIZE, tileLow * TILE_SIZE, (tileColumn + 1) * TILE_SIZE, (tileLow + 1) * TILE_SIZE));
+			bitmap->CopyFromBitmap
+			(
+				&point, m_tileImageList[iterTile->second]->GetBitMap(), 
+				&D2D1::RectU
+				(
+					tileColumn * TILE_SIZE, tileLow * TILE_SIZE, 
+					(tileColumn + 1) * TILE_SIZE, (tileLow + 1) * TILE_SIZE
+				)
+			);
 		}//end for column
 	}//end for low
 
@@ -618,7 +625,7 @@ void ImageManager::CenterUIRender(CImage* img, float x, float y, int frameX, int
 		matT = D2D1::Matrix3x2F::Translation
 		(
 			(x - fW * 0.5f * sizeX),
-			(y - fH *0.5f*sizeY)
+			(y - fH * 0.5f * sizeY)
 		);
 		matR = D2D1::Matrix3x2F::Rotation(rot, { fW,fH });
 		matS = D2D1::Matrix3x2F::Scale(sizeX, sizeY);
@@ -627,8 +634,8 @@ void ImageManager::CenterUIRender(CImage* img, float x, float y, int frameX, int
 	{
 		matT = D2D1::Matrix3x2F::Translation
 		(
-			(x + fW * 0.5f*sizeX), 
-			(y - fH * 0.5f*sizeY)
+			(x + fW * 0.5f * sizeX),
+			(y - fH * 0.5f * sizeY)
 		);
 		matR = D2D1::Matrix3x2F::Rotation(rot, { fW,fH });
 		matS = D2D1::Matrix3x2F::Scale(-sizeX, sizeY);
@@ -637,7 +644,7 @@ void ImageManager::CenterUIRender(CImage* img, float x, float y, int frameX, int
 	m_d2dContext->SetTarget(m_layer[eLayerTop]);
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
 		D2D1::RectF(0, 0, fW, fH),
-		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, D2D1::RectF(frameX * fW, frameY*fH, (frameX+1)*fW, (frameY+1)*fH));
+		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR, D2D1::RectF(frameX * fW, frameY * fH, (frameX + 1) * fW, (frameY + 1) * fH));
 
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
 	m_d2dContext->SetTarget(Direct2DBackBuffer);
@@ -704,9 +711,21 @@ void ImageManager::FrameRender(CImage* img, float x, float y, int frameX, int fr
 
 void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, int frameY, eLayer layer, float scaleX, float scaleY, float rot, float alpha)
 {
+	float fW = img->GetFrameWidth() * 0.5f;
+	float fH = img->GetFrameHeight() * 0.5f;
 	D2D1_MATRIX_3X2_F matT, matR, matS;
-	matT = D2D1::Matrix3x2F::Translation(((x - img->GetFrameWidth() * 0.5f) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((y - img->GetFrameHeight() * 0.5f) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
-	matR = D2D1::Matrix3x2F::Rotation(rot, { (float)img->GetFrameWidth(),(float)img->GetFrameHeight() });
+	
+	if (scaleX != 1)
+	{
+		x += img->GetFrameWidth() * (1 - scaleX) / 2;
+	}
+	if (scaleY != 1)
+	{
+		y += img->GetFrameHeight() * (1 - scaleX) / 2;
+	}
+	
+	matT = D2D1::Matrix3x2F::Translation(((x - fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((y - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
+	matR = D2D1::Matrix3x2F::Rotation(rot, { 2 * fW,2 * fH });
 	matS = D2D1::Matrix3x2F::Scale(scaleX * CAMERA->GetScale(), scaleY * CAMERA->GetScale());
 	if (frameX < 0) frameX = 0;
 	else if (frameX > img->GetMaxFrameX()) frameX = img->GetMaxFrameX();
@@ -717,9 +736,9 @@ void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, 
 	m_d2dContext->SetTarget(m_layer[layer]);
 
 	m_d2dContext->DrawBitmap(img->GetBitMap(),
-		D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()),
+		D2D1::RectF(0, 0, fW * 2, fH * 2),
 		alpha, D2D1_BITMAP_INTERPOLATION_MODE_NEAREST_NEIGHBOR,
-		D2D1::RectF(img->GetFrameWidth() * frameX, img->GetFrameHeight() * frameY, img->GetFrameWidth() * (frameX + 1), img->GetFrameHeight() * (frameY + 1)));
+		D2D1::RectF(fW * 2 * frameX, fH * 2 * frameY, fW * 2 * (frameX + 1), fH * 2 * (frameY + 1)));
 
 	if (KEYMANAGER->isToggleKey(VK_F7))
 		m_d2dContext->DrawRectangle(D2D1::RectF(0, 0, img->GetFrameWidth(), img->GetFrameHeight()), m_blackBrush);
@@ -790,7 +809,7 @@ void ImageManager::ImageLoad()
 	AddImage("UI_Title", L"Resources/Image/UI/title.png", 1);
 	AddImage("UI_MenuCursur", L"Resources/Image/UI/menuCursur.png", 6);
 	AddImage("UI_Number", L"Resources/Image/UI/number.png", 4);
-	AddImage("UI_Text", L"Resources/Image/UI/fontsmall.png", 32,32);
+	AddImage("UI_Text", L"Resources/Image/UI/fontsmall.png", 32, 32);
 
 	AddImage("PlayerImageSheet", L"Resources/Image/Tile/player.png", 32, 32);
 	AddImage("BowImageSheet", L"Resources/Image/Tile/bow.png", 32, 32);
@@ -803,9 +822,11 @@ void ImageManager::ImageLoad()
 	AddImage("SludgeheartShadow", L"Resources/Image/Boss/ACIDNERVE/acidnerveShadow.png", 5);
 	AddImage("ColossusBody", L"Resources/Image/Boss/COLOSSUS/colossusBody.png", 1, 1);
 	AddImage("ColossusBodyLight", L"Resources/Image/Boss/COLOSSUS/colossusBodyLight.png", 1, 1);
-	AddImage("ColossusHand", L"Resources/Image/Boss/COLOSSUS/colossusHand.png", 4, 1);
-	AddImage("ColossusHandShadow", L"Resources/Image/Boss/COLOSSUS/colossusHandShadow.png", 4, 1);
-	AddImage("ColossusHandSleep", L"Resources/Image/Boss/COLOSSUS/colossusHandSleep.png", 1, 1);
+	AddImage("ColossusHandLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandLeft.png", 4, 1);
+	AddImage("ColossusHandRight", L"Resources/Image/Boss/COLOSSUS/colossusHandRight.png", 4, 1);
+	AddImage("ColossusHandShadowLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowLeft.png", 4, 1);
+	AddImage("ColossusHandShadoRIght", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowRight.png", 4, 1);
+	AddImage("ColossusHandSleep", L"Resources/Image/Boss/COLOSSUS/colossusShoulder.png", 2, 1);
 	AddImage("ColossusHead", L"Resources/Image/Boss/COLOSSUS/colossusHead.png", 5, 1);
 	AddImage("ColossusSludge", L"Resources/Image/Boss/COLOSSUS/colossusSludge.png", 6, 1);
 

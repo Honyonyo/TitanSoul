@@ -72,7 +72,6 @@ public:
 	void SetAttackRange()
 	{
 		m_attackCenter = { m_center.x + cosf(m_rotRadian) * 4.f , m_center.y + sin(m_rotRadian) * 4.f };//중심점에서 바라보는 각도를 향해 4px만큼 떨어져있음
-
 	}
 
 	//활시위 당기기->화살 쏘기->화살 날아가기
@@ -85,7 +84,7 @@ public:
 	//화살 불러오기
 	void Retrieve();
 	//화살 회수
-	void PickArrow();	//##함수 완성하기
+	void PickArrow();
 
 	float RotateFromDirection(eMoveDirection direction)
 	{

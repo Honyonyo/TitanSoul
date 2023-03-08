@@ -12,8 +12,8 @@ HRESULT Floor::Init(void)
 	}
 
 	m_colossus = new Colossus;
+	m_colossus->SetFloor();
 	m_colossus->Init();
-	m_colossus->SetPosition(800.f + 8, 896.f - TILE_SIZE);
 	OBJECTMANAGER->AddObject(m_colossus);
 	m_yetiGate=RectMakeCenter(800, 1584, 32, 64);
 
@@ -26,7 +26,7 @@ void Floor::Release(void)
 
 void Floor::Update(void)
 {
-	if (PtInRect(&m_yetiGate, PLAYER->GetCenterPOINT()))
+	if (PtInRect(&m_yetiGate, PLAYER->GetPoint()))
 	{
 		SCENEMANAGER->changeScene("YetiScene");
 	}
@@ -70,8 +70,8 @@ Floor::Floor()
 	LoadTile(&m_tileLayerVector, "Floor.json");
 
 	PLAYER->SetSleepOnOff(false);
-	m_playerStartPos = { 808.0f, 3288.0f };
-	//m_playerStartPos = { 800.0f, 1000.0f };
+	//m_playerStartPos = { 808.0f, 3288.0f };
+	m_playerStartPos = { 800.0f, 1000.0f };
 }
 
 Floor::~Floor()
