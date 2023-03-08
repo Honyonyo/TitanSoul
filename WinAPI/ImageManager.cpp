@@ -715,11 +715,11 @@ void ImageManager::CenterFrameRender(CImage* img, float x, float y, int frameX, 
 	float fH = img->GetFrameHeight() * 0.5f;
 	D2D1_MATRIX_3X2_F matT, matR, matS;
 	
-	if (scaleX != 1)
+	if (scaleX != 1.f)
 	{
 		x += img->GetFrameWidth() * (1 - scaleX) / 2;
 	}
-	if (scaleY != 1)
+	if (scaleY != 1.f)
 	{
 		y += img->GetFrameHeight() * (1 - scaleX) / 2;
 	}
@@ -825,7 +825,7 @@ void ImageManager::ImageLoad()
 	AddImage("ColossusHandLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandLeft.png", 4, 1);
 	AddImage("ColossusHandRight", L"Resources/Image/Boss/COLOSSUS/colossusHandRight.png", 4, 1);
 	AddImage("ColossusHandShadowLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowLeft.png", 4, 1);
-	AddImage("ColossusHandShadoRIght", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowRight.png", 4, 1);
+	AddImage("ColossusHandShadoRight", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowRight.png", 4, 1);
 	AddImage("ColossusHandSleep", L"Resources/Image/Boss/COLOSSUS/colossusShoulder.png", 2, 1);
 	AddImage("ColossusHead", L"Resources/Image/Boss/COLOSSUS/colossusHead.png", 5, 1);
 	AddImage("ColossusSludge", L"Resources/Image/Boss/COLOSSUS/colossusSludge.png", 6, 1);

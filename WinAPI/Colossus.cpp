@@ -36,7 +36,18 @@ void Colossus::Update()
 		//씬전환 후 alive, wake, !ready
 		if (m_wakeup)
 		{
-
+			if (!m_handL->GetIsAttacking() && !m_handR->GetIsAttacking())
+			{
+				//플레이어가 오른쪽에 있을 때
+				if (PLAYER->GetPointF().x > m_center.x)
+				{
+					m_handR->AttackStart();
+				}
+				else
+				{
+					m_handL->AttackStart();
+				}
+			}
 		}
 		else
 		{
@@ -108,10 +119,14 @@ void Colossus::Hit(eObjectKinds kinds)
 		else
 		{
 			m_ready = true;
-			CAMERA->SetCameraMove(m_center, true, true, 5);
-			CAMERA->SetCameraShaking(true, 5, 15);
 			m_headImageIdx = 2;
 			m_isOnHit = false;
+
+			m_handL->SetImageFrame(3);
+			m_handR->SetImageFrame(3);
+
+			CAMERA->SetCameraMove(m_center, true, true, 5);
+			CAMERA->SetCameraShaking(true, 5, 15);
 		}
 		break;
 	default:
@@ -144,8 +159,8 @@ Colossus::Colossus()
 	m_ready = false;
 	m_sceneChangeAlpha = 0;
 
-	m_handL = new ColossusHand(&m_center, true);
-	m_handR = new ColossusHand(&m_center, false);
+	m_handL = new ColossusHand(true);
+	m_handR = new ColossusHand(false);
 }
 
 Colossus::~Colossus()
@@ -156,17 +171,47 @@ Colossus::~Colossus()
 #pragma region 콜로서스 손
 void ColossusHand::Init()
 {
-	//m_image[eHand] = IMAGEMANAGER->FindImage("ColossusHand");
-	//m_image[eHandShadow] = IMAGEMANAGER->FindImage("ColossusHandShadow");
+	if (m_leftHand)
+	{
+		m_image = IMAGEMANAGER->FindImage("ColossusHandLeft");
+		//##그림자 터져
+		m_shadow = IMAGEMANAGER->FindImage("ColossusHandShadowLeft");
+		m_center.x = 760;
+	}
+	else
+	{
+		m_image = IMAGEMANAGER->FindImage("ColossusHandRight");
+		m_shadow = IMAGEMANAGER->FindImage("colossusHandShadowRight");
+		m_center.x = 856;
+	}
 }
 
 void ColossusHand::Update()
 {
+	if (m_attack)
+	{
+		if (m_up)
+		{
+			HandUp();
+		}
+		else if (m_down)
+		{
+			HandDown();
+		}
+	}
+	else if (m_comeback)
+	{
+		ComeBack();
+	}
 }
 
 void ColossusHand::Render()
 {
+	eLayer layer = PLAYER->GetPointF().y > m_hitboxCenter.y ? eLayerUnderPlayer : eLayerUpperPlayer;
+	if (m_attack) layer = eLayerUpperPlayer;
 
+	IMAGEMANAGER->CenterFrameRender(m_image, m_hitboxCenter.x, m_hitboxCenter.y, m_imageFrame, 0, layer);
+	IMAGEMANAGER->CenterFrameRender(m_shadow, m_attackCenter.x, m_attackCenter.y, m_imageFrame, 0, eLayerShadow);
 }
 
 void ColossusHand::Release()
@@ -186,36 +231,109 @@ void ColossusHand::Hit(eObjectKinds kinds)
 
 void ColossusHand::HandUp()
 {
+	m_attackCenter = PLAYER->GetPointF();
+	float moveDistanceH = (-sqrtf(m_actionTime) + sqrtf(m_actionTime + DELTA_TIME))
+		* MY_UTIL::getDistance(m_center.x, m_center.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80);
+	float angleH = MY_UTIL::getAngle(m_hitboxCenter.x, m_hitboxCenter.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80);
+	m_hitboxCenter.x += cosf(angleH) * moveDistanceH;
+	m_hitboxCenter.y -= sinf(angleH) * moveDistanceH;
+	float moveDistanceA = (-sqrtf(m_actionTime) + sqrtf(m_actionTime + DELTA_TIME))
+		* MY_UTIL::getDistance(m_center.x, m_center.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y);
+	float angleA = MY_UTIL::getAngle(m_hitboxCenter.x, m_hitboxCenter.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y);
+	m_attackCenter.x += cosf(angleA) * moveDistanceA;
+	m_attackCenter.y -= sinf(angleA) * moveDistanceA;
+	m_actionTime += DELTA_TIME;
+	if (m_actionTime >= 1.f)
+	{
+		m_up = false;
+		m_down = true;
+		m_actionTime = 0;
+		m_center = m_hitboxCenter;
+		m_imageFrame = 0;
+	}
 }
 
 void ColossusHand::HandDown()
 {
+	if (m_actionTime < 0.25f)
+	{
+		m_attackCenter = PLAYER->GetPointF();
+		float moveDistance = (-sqrtf(m_actionTime) + sqrtf(m_actionTime + DELTA_TIME))
+			* MY_UTIL::getDistance(m_center.x, m_center.y, m_attackCenter.x, m_attackCenter.y) / sqrtf(0.5f);
+		float angle = MY_UTIL::getAngle(m_hitboxCenter.x, m_hitboxCenter.y, m_attackCenter.x, m_attackCenter.y);
+		m_hitboxCenter.x += cosf(angle) * moveDistance;
+		m_hitboxCenter.y = m_attackCenter.y - 80.f + 160.f * m_actionTime;
+	}
+	else if (m_actionTime < 0.5f)
+	{
+		m_hitboxCenter.y = m_attackCenter.y - 80.f + 160.f * m_actionTime;
+		if (m_hitboxCenter.y >= m_attackCenter.y)
+		{
+			m_hitboxCenter.y = m_attackCenter.y;
+			m_attack = false;
+			m_down = false;
+			m_comeback = true;
+			m_isOnAttack = true;
+			m_isOnHit = true;
+			m_actionTime = 0.f;
+			m_center = m_attackCenter;
+		}
+		else if (m_hitboxCenter.y >= m_attackCenter.y - 2.f)
+		{
+			m_isOnAttack = true;
+			m_isOnHit = true;
+		}
+	}
+	else
+	{
+		m_down = false;
+		m_comeback = true;
+		m_attack = false;
+		m_actionTime = 0;
+		m_center = m_hitboxCenter;
+		m_imageFrame = 3;
+	}
+	m_actionTime += DELTA_TIME;
 }
 
 void ColossusHand::ComeBack()
 {
+	m_actionTime += DELTA_TIME;
+	if (m_actionTime < 1.0f) return;
+
+	float distance = m_moveSpeed * DELTA_TIME;
+	float angle = MY_UTIL::getAngle(m_hitboxCenter.x, m_hitboxCenter.y, m_colossusCenter.x, m_colossusCenter.y);
+	m_hitboxCenter.x += cosf(angle) * distance;
+	m_hitboxCenter.y -= sinf(angle) * distance;
+	if (MY_UTIL::getDistance(m_hitboxCenter.x, m_hitboxCenter.y, m_colossusCenter.x, m_colossusCenter.y) <= distance)
+	{
+		m_hitboxCenter = m_colossusCenter;
+		m_center = m_hitboxCenter;
+		m_comeback = false;
+		m_imageFrame = 3;
+		m_actionTime = 0.f;
+	}
+
 }
 
-ColossusHand::ColossusHand(D2D1_POINT_2F* colossusCenter, bool leftHand)
+ColossusHand::ColossusHand(bool leftHand)
+	:
+	m_imageFrame(2),
+	m_moveSpeed(15),
+	m_actionTime(0),
+	m_leftHand(leftHand),
+	m_attack(false),
+	m_up(false),
+	m_down(false),
+	m_comeback(false),
+	m_colossusCenter({ 816, 928 })
 {
 	m_kinds = eMonsterProjectile;
-	m_colossusCenter = colossusCenter;
-	m_leftHand = leftHand;
-	if (leftHand)
-	{
-		m_image = IMAGEMANAGER->FindImage("ColossusHandLeft");
-		m_center.x = colossusCenter->x - 80;
-	}
-	else
-	{
-		m_image = IMAGEMANAGER->FindImage("ColossusHandRight");
-		m_center.x = colossusCenter->x + 80;
-	}
-	//	D2D1_POINT_2F m_center;	//오브젝트 중심점
-	//	float m_hitboxRange;	//피격 범위
-	//	D2D_POINT_2F m_hitboxCenter;	//피격범위의 중심점
-	//	float m_attackRange;	//공격범위
-	//	D2D1_POINT_2F m_attackCenter;		//공격범위의 중심점
+	m_colossusCenter = { 800.f + 8, 920.f + 16 };
+
+	m_center.x = leftHand ? 760 : 856;
+	m_center.y = 968;
+	m_hitboxCenter = m_attackCenter = m_center;
 
 }
 
