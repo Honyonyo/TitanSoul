@@ -63,6 +63,7 @@ private:
 	//D2D Brush
 	ID2D1SolidColorBrush* m_brush;
 	ID2D1SolidColorBrush* m_blackBrush;
+	ID2D1SolidColorBrush* m_whiteBrush;
 
 private:
 	ID2D1Factory1* _pD2Dfactory;
@@ -143,6 +144,7 @@ public:
 	void DrawCircle(float x, float y, float width);
 	void DrawCircleCamera(float x, float y, float width);
 	void DrawBlackRect(RECT rt, eLayer layer, float opacity = 1);
+	void DrawWhiteRect(RECT rt, eLayer layer, float opacity);
 	void DrawRectCenter(RECT rt, CImage* img);
 	void DrawColorRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, D2D1_COLOR_F colr);
 

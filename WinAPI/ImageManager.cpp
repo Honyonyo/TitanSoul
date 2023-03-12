@@ -146,6 +146,7 @@ void ImageManager::Init()
 	color.g = 0;
 	color.b = 0;
 	m_d2dContext->CreateSolidColorBrush(color, &m_blackBrush);
+	m_d2dContext->CreateSolidColorBrush(D2D1::ColorF(1,1,1), &m_whiteBrush);
 	m_d2dContext->CreateSolidColorBrush(color, &m_brush);
 	ImageLoad();
 
@@ -503,6 +504,15 @@ void ImageManager::DrawBlackRect(RECT rt, eLayer layer, float opacity)
 	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
 	m_d2dContext->SetTarget(Direct2DBackBuffer);
 }
+void ImageManager::DrawWhiteRect(RECT rt, eLayer layer, float opacity)
+{
+	m_whiteBrush->SetOpacity(opacity);
+	m_d2dContext->SetTarget(m_layer[layer]);
+	m_d2dContext->FillRectangle(D2D1_RECT_F{ (float)rt.left ,(float)rt.top,(float)rt.right,(float)rt.bottom }, (m_whiteBrush));
+	m_whiteBrush->SetOpacity(1);
+	m_d2dContext->SetTransform(D2D1::Matrix3x2F::Identity());
+	m_d2dContext->SetTarget(Direct2DBackBuffer);
+}
 
 void ImageManager::DrawRectCenter(RECT rt, CImage* img)
 {
@@ -825,7 +835,7 @@ void ImageManager::ImageLoad()
 	AddImage("ColossusHandLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandLeft.png", 4, 1);
 	AddImage("ColossusHandRight", L"Resources/Image/Boss/COLOSSUS/colossusHandRight.png", 4, 1);
 	AddImage("ColossusHandShadowLeft", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowLeft.png", 4, 1);
-	AddImage("ColossusHandShadoRight", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowRight.png", 4, 1);
+	AddImage("ColossusHandShadowRight", L"Resources/Image/Boss/COLOSSUS/colossusHandShadowRight.png", 4, 1);
 	AddImage("ColossusHandSleep", L"Resources/Image/Boss/COLOSSUS/colossusShoulder.png", 2, 1);
 	AddImage("ColossusHead", L"Resources/Image/Boss/COLOSSUS/colossusHead.png", 5, 1);
 	AddImage("ColossusSludge", L"Resources/Image/Boss/COLOSSUS/colossusSludge.png", 6, 1);

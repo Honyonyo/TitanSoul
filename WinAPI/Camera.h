@@ -23,6 +23,7 @@ private:
 	float m_shakingLv;
 	float m_shakingSpeed;
 	float m_shakeChange;
+	float m_shakingTime;
 
 	void SetRenderT();
 	void SetCameraCenter();
@@ -52,11 +53,12 @@ public:
 	//카메라 흔들림 설정
 	//흔들림 스위치, 흔들림 강도(초당 몇픽셀), 속도
 	//		SetCameraShaking(true, 2, 20); 요정도가 요동둉
-	void SetCameraShaking(bool shakingOnOff, float shakingLv, float shakingSpeed = 1.f)
+	void SetCameraShaking(bool shakingOnOff, float shakingLv, float shakingSpeed = 1.f, float shakingTime = 100.f)
 	{
 		m_shaking = shakingOnOff; 
 		m_shakingLv = shakingLv;
 		m_shakingSpeed = shakingSpeed;
+		m_shakingTime = shakingTime;
 	}
 	//카메라 흔들림 끄기
 	void SetCameraShakingOff()
@@ -66,7 +68,8 @@ public:
 		m_shakingLv = 0;
 		m_shakeChange = 0;
 		m_shakingSpeed = 1.f;
-		SetCameraMove(PLAYER->GetPointF(), false, true, 1);
+		m_shakingTime = 0.f;
+		SetCameraMove(PLAYER->GetPointF(), false, false, 1);
 	}
 
 	void SetScaleIncease(bool onOff)

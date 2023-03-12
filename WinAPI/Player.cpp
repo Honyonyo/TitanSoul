@@ -85,7 +85,7 @@ void Player::Update()
 		else if (m_arrow->GetIsReady())
 		{
 			m_state = eShotting;
-			m_arrow->DrawBow(m_direction);
+			m_direction = m_arrow->DrawBow(m_direction);
 		}
 
 	}//end if 'C'		선형보간 - 이동하는 목표점을 향해 가야할 경우 유용(난 필요 없을듯?)
@@ -184,6 +184,7 @@ void Player::Hit(eObjectKinds kinds)
 	switch (kinds)
 	{
 	case eMonster:
+	//case eMonsterProjectile:
 		m_isAlive = false;
 		m_nonCansleAction = true;
 		m_state = eDeath;

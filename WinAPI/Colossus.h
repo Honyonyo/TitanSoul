@@ -23,7 +23,8 @@ private:
 	int m_headImageIdx;
 
 	float m_sceneChangeAlpha;
-
+	bool m_hitpointEffectOn;
+	float m_hitpointEffectAlpha;
 
 	ColossusHand* m_handL;
 	ColossusHand* m_handR;
@@ -53,6 +54,7 @@ class ColossusHand : public Object
 
 	//들어올리기와 찍기가 각각 1초씩 들어감
 	D2D1_POINT_2F m_colossusCenter;
+	D2D1_POINT_2F m_moveStartP;
 
 	float m_moveSpeed;
 	float m_actionTime;
@@ -74,11 +76,13 @@ public:
 	
 	void AttackStart()
 	{
+		m_moveStartP = m_center;
+
 		m_attack = true;
 		m_up = true;
 		m_down = false;
 		m_comeback = false;
-		m_imageFrame = 1;
+		m_imageFrame = 0;
 		m_actionTime = 0.f;
 
 		m_isOnAttack = false;
@@ -90,6 +94,12 @@ public:
 	void ComeBack();
 
 	inline bool GetIsAttacking() { return m_attack; }
+	inline bool GetIsOnDeffend() 
+	{
+		if (m_hitboxCenter.x == m_colossusCenter.x && m_hitboxCenter.y == m_colossusCenter.y)
+			return true;
+		else return false;
+	}
 	void SetImageFrame(int frameNumber)
 	{
 		m_imageFrame = frameNumber;

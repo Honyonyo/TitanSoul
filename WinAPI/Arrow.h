@@ -47,7 +47,9 @@ public:
 			//PickArrow();
 			break;
 		case eMonster:
+		case eMonsterProjectile:
 			m_speed = 0;
+			break;
 		}
 	}
 	virtual void Hit(eObjectKinds kinds)
@@ -78,7 +80,7 @@ public:
 	//화살 다가오기
 
 	//활시위 당기는 중
-	void DrawBow(eMoveDirection direction);
+	eMoveDirection DrawBow(eMoveDirection direction);
 	//활 놓음
 	void ShotArrow();
 	//화살 불러오기
@@ -86,6 +88,7 @@ public:
 	//화살 회수
 	void PickArrow();
 
+	bool RotateChangeOnDrawBow();
 	float RotateFromDirection(eMoveDirection direction)
 	{
 		switch (direction)
@@ -105,12 +108,24 @@ public:
 			return NULL;
 		}
 	}
+	eMoveDirection DirectionFromRotate()
+	{
+		if (m_rot < 22.5f) return  eRight;
+		else if (m_rot < 67.5f) return  eRightDown;
+		else if (m_rot < 112.5f) return  eDown;
+		else if (m_rot < 157.5) return  eLeftDown;
+		else if (m_rot < 202.5) return  eLeft;
+		else if (m_rot < 247.5) return  eLeftUp;
+		else if (m_rot < 292.5) return  eUp;
+		else if (m_rot < 337.5) return  eRightUp;
+		else return  eRight;
+	}
 
 	Arrow() : m_speed(0), m_isShotted(false), m_playerAnimation(nullptr)
 	{
 	}
 	Arrow(Animation* ani, D2D1_POINT_2F* center) :
-		 m_isShotted(false), m_isDrawed(false), m_isRetrieved(false),
+		m_isShotted(false), m_isDrawed(false), m_isRetrieved(false),
 		m_speed(0), m_rot(0), m_rotRadian(0), m_drawTime(0.0f),
 		m_isReady(true), m_isOnPickupAni(false)
 	{

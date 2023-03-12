@@ -3,7 +3,7 @@
 Camera::Camera(float scale) :
 	m_camRot(0.f),
 	m_scaleIncrease(false), m_moveToRT(false), m_moving(false), m_moveSpeed(0.f),
-	m_shakingLeft(false), m_shaking(false), m_shakingSpeed(1.f), m_shakingLv(0), m_shakeChange(0)
+	m_shakingLeft(false), m_shaking(false), m_shakingSpeed(1.f), m_shakingLv(0), m_shakeChange(0), m_shakingTime(0.f)
 {
 	m_camScale = scale;
 	m_camWidth = WINSIZE_X / scale;
@@ -45,15 +45,6 @@ void Camera::Update()
 		{
 			m_camScale = IMAGE_SCALE;
 		}
-	}
-
-	if (KEYMANAGER->isOnceKeyDown('I'))
-	{
-		SetCameraShaking(true, 2, 20);
-	}
-	if (KEYMANAGER->isOnceKeyDown('U'))
-	{
-		SetCameraShaking(false, 0);
 	}
 
 	SetCameraCenter();
@@ -172,16 +163,27 @@ void Camera::SetCameraCenter()
 
 void Camera::SetShaking()
 {
+	m_shakingTime -= DELTA_TIME;
+	if (m_shakingTime <= 0)
+	{
+		SetCameraShakingOff();
+	}
 	if (!m_shaking) return;
 	if (m_shakingLeft)
 	{
 		m_shakeChange -= m_shakingLv * m_shakingSpeed * DELTA_TIME;
-		if (m_shakeChange <= -m_shakingLv) m_shakingLeft = false;
+		if (m_shakeChange <= -m_shakingLv)
+		{
+			m_shakingLeft = false; 
+		}
 	}
 	else
 	{
 		m_shakeChange += m_shakingLv * m_shakingSpeed * DELTA_TIME;
-		if (m_shakeChange >= m_shakingLv) m_shakingLeft = true;
+		if (m_shakeChange >= m_shakingLv) 
+		{
+			m_shakingLeft = true;
+		}
 
 	}
 	m_centerP_2F.x += m_shakeChange;

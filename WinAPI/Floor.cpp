@@ -12,9 +12,9 @@ HRESULT Floor::Init(void)
 	}
 
 	m_colossus = new Colossus;
+	OBJECTMANAGER->AddObject(m_colossus);
 	m_colossus->SetFloor();
 	m_colossus->Init();
-	OBJECTMANAGER->AddObject(m_colossus);
 	m_yetiGate=RectMakeCenter(800, 1584, 32, 64);
 
     return S_OK;

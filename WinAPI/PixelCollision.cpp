@@ -57,7 +57,6 @@ void PixelCollision::LeftCheck()
 			{
 				switch (i)
 				{
-					cout << "left " << m_pixel[provLeft][m_provbox.left] << endl;
 				case eDiagonal:
 					break;
 				case eWall:
@@ -99,7 +98,6 @@ void PixelCollision::TopCheck()
 			}//색이 다를 때 : 다음루프로
 			else
 			{
-			cout<<"top "<< m_pixel[m_provbox.top][provTop] << endl;
 				switch (i)
 				{
 				case eDiagonal:
@@ -142,7 +140,6 @@ void PixelCollision::RightCheck()
 			}//색이 다를 때 : 다음루프로
 			else
 			{
-				cout << "right " << m_pixel[provRight][m_provbox.right] << endl;
 				switch (i)
 				{
 				case eDiagonal:
@@ -185,7 +182,6 @@ void PixelCollision::BottomCheck()
 			}//색이 다를 때 : 다음루프로
 			else
 			{
-				cout << "bottom " << m_pixel[m_provbox.bottom][provBottom] << endl;
 				switch (i)
 				{
 				case eDiagonal:

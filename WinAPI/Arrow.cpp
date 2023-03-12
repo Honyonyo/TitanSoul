@@ -70,7 +70,7 @@ void Arrow::Render()
 	{
 		if (m_isShotted)
 		{
-			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer,1,1, m_rot);
+			IMAGEMANAGER->CenterFrameRender(m_bigImage, m_center.x, m_center.y, 31, 0, layer, 1, 1, m_rot);
 		}
 		else
 		{
@@ -91,15 +91,29 @@ void Arrow::Release()
 	SAFE_DELETE(m_animation);
 };
 
-void Arrow::DrawBow(eMoveDirection direction)
+eMoveDirection Arrow::DrawBow(eMoveDirection direction)
 {
 	m_isDrawed = true;
 	m_center = *m_playerCenter;
 	m_center.y += 4;
-	m_direction = direction;
-	m_rot = RotateFromDirection(direction);
+	bool pushKey = RotateChangeOnDrawBow();
+	//if (!pushKey)
+	//{
+	//	m_rot = RotateFromDirection(direction);
+	//}
 	m_rotRadian = m_rot * DEG_TO_RAD;
 	m_drawTime = (m_drawTime > 1) ? 1 : m_drawTime + DELTA_TIME;
+	if (pushKey)
+	{
+		m_direction = DirectionFromRotate();
+		return m_direction;
+	}
+	else
+	{
+		m_direction = direction;
+		RotateFromDirection(direction);
+		return direction;
+	}
 };
 
 void Arrow::ShotArrow()
@@ -118,7 +132,7 @@ void Arrow::ShotArrow()
 		m_speed = round(m_drawTime * 100) * 0.1f;
 		if (m_speed > 20) m_speed = 20;
 		m_center.x += 6 * cosf(m_rotRadian);
-		m_center.y += 6 * sinf(m_rotRadian);
+		m_center.y -= 6 * sinf(m_rotRadian);
 		SetAttackRange();
 	}
 
@@ -132,7 +146,7 @@ void Arrow::Move()
 		m_center.x += m_speed * cosf(m_rotRadian);
 		m_center.y += m_speed * sinf(m_rotRadian);
 		m_speed = (m_speed < 0) ? 0 : m_speed - DELTA_TIME * 10;
-	//	cout << "화살 중심점 " << m_center.x << ", " << m_center.y << endl;
+		//	cout << "화살 중심점 " << m_center.x << ", " << m_center.y << endl;
 	}
 	else
 	{
@@ -167,4 +181,70 @@ void Arrow::PickArrow()
 	m_isOnPickupAni = true;
 	m_pickupPoint = m_attackCenter;
 	m_animation->AniStart();
+};
+
+bool Arrow::RotateChangeOnDrawBow()
+{
+	bool changed = false;
+	//좌우키 눌렀을 때 (기준은 180도 이하일 때 왼쪽키 = 각 더하기 / 아닐때 각 빼기)
+	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
+	{
+		if (m_rot < 180.f)
+		{
+			m_rot += 45.f * DELTA_TIME;
+			if (m_rot >= 180.f) m_rot = 180.f;
+		}
+		else
+		{
+			m_rot -= 45 * DELTA_TIME;
+			if (m_rot < 0) m_rot = 0.f;
+		}
+		changed = true;
+	}
+	if (KEYMANAGER->isStayKeyDown(VK_RIGHT))
+	{
+		if (m_rot < 180.f)
+		{
+			m_rot -= 45.f * DELTA_TIME;
+			if (m_rot < 0) m_rot = 0.f;
+		}
+		else
+		{
+			m_rot += 45.f * DELTA_TIME;
+			if (m_rot >= 180) m_rot = 180.f;
+		}
+		changed = true;
+	}
+	//상하키 눌렀을 때 (기준은 90~270일때 위키 = 각 더하기 / 아닐때 각 빼기)
+	if (KEYMANAGER->isStayKeyDown(VK_UP))
+	{
+		if (m_rot > 90.f && m_rot <= 270.f)
+		{
+			m_rot += 45.f * DELTA_TIME;
+			if (m_rot > 270.f) m_rot = 270.f;
+		}
+		else
+		{
+			m_rot -= 45.f * DELTA_TIME;
+			if (m_rot < 90.f) m_rot = 90.f;
+		}
+		changed = true;
+	}
+	if (KEYMANAGER->isStayKeyDown(VK_DOWN))
+	{
+		if (m_rot >= 90.f && m_rot <= 270.f)
+		{
+			m_rot -= 45.f * DELTA_TIME;
+			if (m_rot < 90.f) m_rot = 90.f;
+		}
+		else
+		{
+			m_rot += 45.f * DELTA_TIME;
+			if (m_rot >= 360) m_rot = 0.f;
+			else if (m_rot > 90.f) m_rot = 90.f;
+		}
+		changed = true;
+	}
+
+	return 	changed;
 };
