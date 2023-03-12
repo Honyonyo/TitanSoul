@@ -40,7 +40,15 @@ void Arrow::Update()
 
 	if (m_isShotted)
 	{
-		if (MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y, m_playerCenter->x, m_playerCenter->y) < 10)
+		if (m_direction == eUp)
+		{
+			if (MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y-4, m_playerCenter->x, m_playerCenter->y) < 3)
+			{
+				cout << MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y, m_playerCenter->x, m_playerCenter->y) << endl;
+				PickArrow();
+			}
+		}
+		else if (MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y, m_playerCenter->x, m_playerCenter->y) < 10)
 		{
 			PickArrow();
 		}
@@ -91,29 +99,25 @@ void Arrow::Release()
 	SAFE_DELETE(m_animation);
 };
 
-eMoveDirection Arrow::DrawBow(eMoveDirection direction)
+void Arrow::DrawBowStart(eMoveDirection direction)
 {
 	m_isDrawed = true;
 	m_center = *m_playerCenter;
 	m_center.y += 4;
-	bool pushKey = RotateChangeOnDrawBow();
-	//if (!pushKey)
-	//{
-	//	m_rot = RotateFromDirection(direction);
-	//}
+	m_direction = direction;
+	m_rot = RotateFromDirection(direction);
 	m_rotRadian = m_rot * DEG_TO_RAD;
-	m_drawTime = (m_drawTime > 1) ? 1 : m_drawTime + DELTA_TIME;
-	if (pushKey)
+}
+
+eMoveDirection Arrow::DrawBow()
+{
+	if (RotateChangeOnDrawBow())
 	{
 		m_direction = DirectionFromRotate();
-		return m_direction;
 	}
-	else
-	{
-		m_direction = direction;
-		RotateFromDirection(direction);
-		return direction;
-	}
+	m_rotRadian = m_rot * DEG_TO_RAD;
+	m_drawTime = (m_drawTime > 1) ? 1 : m_drawTime + DELTA_TIME;
+	return m_direction;
 };
 
 void Arrow::ShotArrow()
@@ -146,7 +150,6 @@ void Arrow::Move()
 		m_center.x += m_speed * cosf(m_rotRadian);
 		m_center.y += m_speed * sinf(m_rotRadian);
 		m_speed = (m_speed < 0) ? 0 : m_speed - DELTA_TIME * 10;
-		//	cout << "화살 중심점 " << m_center.x << ", " << m_center.y << endl;
 	}
 	else
 	{
@@ -211,7 +214,7 @@ bool Arrow::RotateChangeOnDrawBow()
 		else
 		{
 			m_rot += 45.f * DELTA_TIME;
-			if (m_rot >= 180) m_rot = 180.f;
+			if (m_rot >=360.f) m_rot = 0.f;
 		}
 		changed = true;
 	}
@@ -227,6 +230,7 @@ bool Arrow::RotateChangeOnDrawBow()
 		{
 			m_rot -= 45.f * DELTA_TIME;
 			if (m_rot < 90.f) m_rot = 90.f;
+			else if (m_rot < 0.f) m_rot += 360;
 		}
 		changed = true;
 	}

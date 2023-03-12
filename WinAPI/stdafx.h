@@ -97,6 +97,7 @@ using std::endl;
 #include "ObjectManager.h"
 #include "JsonSaveLoader.h"
 
+#include "Camera.h"
 #include "enumList.h"
 
 using namespace MY_UTIL;

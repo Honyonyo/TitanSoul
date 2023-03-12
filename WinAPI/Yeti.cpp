@@ -49,17 +49,6 @@ void Yeti::Init()
 
 void Yeti::Update()
 {
-	/// 
-	/// 	동작을 시작하면
-	/// 	해당 bitset을 on한다.
-	/// 	isAction을 true한다
-	///		동작 세팅을 한다. - 애니메이션 프레임 세팅, fps세팅 
-	/// 	actionAni가 끝났는지 확인하고,
-	/// 	안끝나면 현재 m_action에 따라 switch로 함수 호출한다.
-	///		끝나면 해당 동작이 끝난것으로 표시해준다.
-	/// 	다음 동작을 실행한다.
-	/// 	queue가 비어있으면 SetPattern 실행
-
 	eAction prevAction = m_action;
 	eMoveDirection prevDirection = m_direction;
 	int prevFrame = m_animation->GetNowFrameIdx();
@@ -69,6 +58,8 @@ void Yeti::Update()
 	SetCollUpdate(prevFrame);
 	if (m_action == eDeath && !m_animation->IsPlay()) return;
 
+	if (KEYMANAGER->isToggleKey('M')) return;
+
 	//자고있지 않을 때
 	if (m_wakeup)
 	{
@@ -77,7 +68,6 @@ void Yeti::Update()
 		//여기에 동작 끝났는지 확인
 		if (!m_isAction)
 		{
-			SetDirection();
 			if (m_pattern.empty())
 			{
 				SetPattern();
@@ -86,10 +76,12 @@ void Yeti::Update()
 			switch (m_pattern.front())
 			{
 			case eRolling:
+				SetDirection();
 				SetRolling();
 				cout << "SetRolling" << endl;
 				break;
-			case eThrow:
+			case eThrow:			
+				SetDirection();
 				SetThrowSnowball();
 				cout << "SetThrowSnowball" << endl;
 				break;
@@ -189,7 +181,7 @@ void Yeti::Attack(eObjectKinds kinds)
 	switch (kinds)
 	{
 	case ePlayer:
-		cout << "예티 플레이어와 충돌" << endl;
+		SOUNDMANAGER->play("DeathImpact", 1.f);
 		break;
 	default:
 		NULL;
@@ -260,6 +252,9 @@ void Yeti::SetThrowSnowball()
 	snowball = new Snowball(m_center.x, m_center.y - TILE_SIZE);
 	snowball->Init();
 	OBJECTMANAGER->AddObject(snowball);
+	string key = "Yeti_SnowThrow";
+	SOUNDMANAGER->play(key + (char)(RND->getInt(5) + 49), 1.f);
+
 };
 void Yeti::SetRolling()
 {
@@ -306,6 +301,8 @@ void Yeti::Rolling()
 			m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRollingLoop], true, nowFrameIndex - 6);
 			m_animation->SetFPS(7);
 			m_isOnRollingLoop = true;
+			string key = "Yeti_Roll";
+			SOUNDMANAGER->play(key + (char)(RND->getInt(5) + 49), 1.f);
 		}
 	}
 	if (m_isOnRollingLoop)
@@ -383,6 +380,11 @@ void Yeti::Rolling()
 			m_rollingJumpMoveX = (m_rollingDest.x - m_center.x) / 2;	//초당 x이동거리 (총 이동시간 2)
 			m_rollingJumpMoveY = (m_rollingDest.y - m_center.y) / 2;	//초당 y이동거리 (총 이동시간 2)
 
+			string key = "Yeti_YetiBallImpact";
+			SOUNDMANAGER->play(key + (char)(RND->getInt(5) + 49), 1.f);
+
+			CAMERA->SetCameraShaking(true, 3, 32, 0.5f);
+
 			IcicleDrop();
 			//충돌하면
 			// 타일 2~3장높이정도 뜬 다음
@@ -411,6 +413,10 @@ void Yeti::Rolling()
 					m_isOnRollingLoop = false;
 					m_animation->SetPlayFrame(m_aniIndexArr[m_direction][eRolling], false, m_aniIndexArr[m_direction][eRolling].size() - 1);
 					m_animation->AniResume();
+
+					string key = "Yeti_YetiLand";
+					SOUNDMANAGER->play(key + (char)(RND->getInt(5) + 49), 1.f);
+
 				}
 			}
 			m_shadowCenter.x += m_rollingJumpMoveX * DELTA_TIME;
@@ -447,7 +453,6 @@ void Yeti::IcicleDrop()
 	POINT dropCenter = { 8 + (m_center.x) / TILE_SIZE * TILE_SIZE, 8 + (m_center.y / TILE_SIZE) * TILE_SIZE };
 	while (i < 7)
 	{
-
 		dropCenter.x += (tmp + RND->getfloat(1.6) - 0.8) * TILE_SIZE;
 		dropCenter.y += (slop + RND->getfloat(1.6) - 0.8) * TILE_SIZE * 2;
 		RECT rc = { 0,0,SCENEMANAGER->GetCurrentSceneWidth(), SCENEMANAGER->GetCurrentSceneHeight() };
@@ -470,7 +475,11 @@ void Yeti::IcicleDrop()
 }
 void Yeti::Ready(int prevFrame)
 {
-
+	if (prevFrame != m_animation->GetNowFrameIdx())
+	{
+		if(m_animation->GetNowFrameIdx() == 2)
+			SetDirection();
+	}
 };
 
 void Yeti::SetCollUpdate(int aniIdx)

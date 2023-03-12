@@ -12,6 +12,8 @@ public:
 	virtual void Release(void);
 	virtual void Update(void);
 	virtual void Render(void);
+	virtual void SetOn();
+	virtual void SetOff();
 
 	Floor();
 	~Floor();

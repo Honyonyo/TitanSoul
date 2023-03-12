@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Colossus.h"
-#include "Camera.h"
 
 void Colossus::Attack()
 {
@@ -31,10 +30,9 @@ void Colossus::Update()
 {
 	if (m_isAlive)
 	{
-		if (KEYMANAGER->isOnceKeyDown('I'))
+		if (KEYMANAGER->isOnceKeyDown('M'))
 		{
-			Hit(eArrow);
-			cout << m_hitboxCenter.x << ", " << m_hitboxCenter.y << endl;
+			return;
 		}
 
 		if (m_wakeup)
@@ -93,7 +91,10 @@ void Colossus::Update()
 	{
 		m_sceneChangeAlpha -= 0.2 * DELTA_TIME;
 		if (m_sceneChangeAlpha < 0)
+		{
 			m_sceneChangeAlpha = NULL;
+			SOUNDMANAGER->play("BGMFloor",1.f);
+		}
 	}
 	//죽은상태에서 sCA = NULL인경우
 	else
@@ -136,7 +137,7 @@ void Colossus::Render()
 		IMAGEMANAGER->CenterFrameRender(m_image[eShoulder], m_center.x + 56, m_center.y - 16, 1, 0, eLayerUnderPlayer);
 
 		if (m_hitpointEffectOn)
-		{	
+		{
 			int tmp = (int)m_hitpointEffectAlpha;
 			float alpha = tmp % 2 ?
 				m_hitpointEffectAlpha - tmp : 1 + tmp - m_hitpointEffectAlpha;
@@ -154,7 +155,10 @@ void Colossus::Release()
 
 void Colossus::Attack(eObjectKinds kinds)
 {
-
+	if (kinds == ePlayer)
+	{
+		SOUNDMANAGER->play("DeathCrush", 1.f);
+	}
 }
 
 void Colossus::Hit(eObjectKinds kinds)
@@ -168,6 +172,8 @@ void Colossus::Hit(eObjectKinds kinds)
 			m_sceneChangeAlpha = 1.f;
 			m_wakeup = false;
 			m_isAlive = false;
+			SOUNDMANAGER->stop("BGMColosus");
+			SOUNDMANAGER->play("Colossus_Roar",1.f);
 			GAMEMANAGER->SetBossDead(eColossus);
 		}
 		else if (m_isAlive)
@@ -179,7 +185,9 @@ void Colossus::Hit(eObjectKinds kinds)
 
 			m_handL->SetImageFrame(3);
 			m_handR->SetImageFrame(3);
-
+			SOUNDMANAGER->stop("BGMFloor");
+			SOUNDMANAGER->play("BGMColosus",1.f);
+			SOUNDMANAGER->play("Colossus_Rise",1.f);
 			CAMERA->SetCameraMove(m_center, true, true, 5);
 			CAMERA->SetCameraShaking(true, 5, 15);
 		}
@@ -242,6 +250,7 @@ void ColossusHand::Init()
 
 void ColossusHand::Update()
 {
+	if (KEYMANAGER->isToggleKey('M'))	 return;
 	if (m_attack)
 	{
 		if (m_up)
@@ -315,14 +324,14 @@ void ColossusHand::HandDown()
 	if (m_actionTime < 0.25f)
 	{
 		float moveDistance = sqrtf(m_actionTime)
-			* MY_UTIL::getDistance(m_moveStartP.x, m_moveStartP.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y) / 0.05/*sqrtf(0.25f)*/;
+			* MY_UTIL::getDistance(m_moveStartP.x, m_moveStartP.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y)/*sqrtf(0.25f)*/;
 		float angle = MY_UTIL::getAngle(m_moveStartP.x, m_moveStartP.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y);
 		m_attackCenter.x = m_moveStartP.x + cosf(angle) * moveDistance;
 		m_attackCenter.y = m_moveStartP.y - sinf(angle) * moveDistance;
 		m_hitboxCenter.x = m_attackCenter.x;
 		m_hitboxCenter.y = m_attackCenter.y - 80.f + 160.f * m_actionTime;
 	}
-	else if (m_actionTime < 0.5f)
+	else if (m_actionTime > 0.5f&& m_actionTime<1.f)
 	{
 		m_hitboxCenter.y = m_attackCenter.y - 80.f + 160.f * m_actionTime;
 		//0.8
@@ -331,16 +340,30 @@ void ColossusHand::HandDown()
 			m_hitboxCenter.y = m_attackCenter.y;
 			m_isOnAttack = true;
 			m_isOnHit = true;
+
+			if (!m_playHitEffectSound)
+			{
+				m_playHitEffectSound = true;
+				string key = "Colossus_Hit";
+				SOUNDMANAGER->play(key + (char)(RND->getInt(4) + 49), 1.f);
+			}
 			CAMERA->SetCameraShaking(true, 3, 32, 0.5f);
 		}
 		else if (m_hitboxCenter.y >= m_attackCenter.y - 2.f)
 		{
 			m_isOnAttack = true;
 			m_isOnHit = true;
+
+			if (!m_playHitEffectSound)
+			{
+				m_playHitEffectSound = true;
+				string key = "Colossus_Hit";
+				SOUNDMANAGER->play(key + (char)(RND->getInt(4) + 49), 1.f);
+			}
 			CAMERA->SetCameraShaking(true, 3, 32, 0.5f);
 		}
 	}
-	else if (m_actionTime >= 1.5f)
+	else if (m_actionTime >= 2.f)
 	{
 		m_down = false;
 		m_comeback = true;
@@ -358,25 +381,30 @@ void ColossusHand::ComeBack()
 	float angle = MY_UTIL::getAngle(m_hitboxCenter.x, m_hitboxCenter.y, m_colossusCenter.x, m_colossusCenter.y);
 	m_hitboxCenter.x += cosf(angle) * distance;
 	m_hitboxCenter.y -= sinf(angle) * distance;
+	m_center = m_hitboxCenter;
+	m_attackCenter = m_hitboxCenter;
 	if (MY_UTIL::getDistance(m_hitboxCenter.x, m_hitboxCenter.y, m_colossusCenter.x, m_colossusCenter.y) <= distance)
 	{
 		m_hitboxCenter = m_colossusCenter;
-		m_center = m_hitboxCenter;
-		m_attackCenter = m_hitboxCenter;
 		m_comeback = false;
 		m_imageFrame = 2;
 		m_actionTime = 0.f;
 	}
 }
 
+void ColossusHand::PlaySoundEffect()
+{
+}
+
 ColossusHand::ColossusHand(bool leftHand)
 	:
 	m_image(nullptr), m_shadow(nullptr),
 	m_imageFrame(2),
-	m_moveSpeed(80),
+	m_moveSpeed(64),
 	m_actionTime(0),
 	m_leftHand(leftHand),
 	m_attack(false), m_up(false), m_down(false), m_comeback(false),
+	m_playHitEffectSound(false),
 	m_colossusCenter({ 816, 928 })
 {
 	m_kinds = eMonsterProjectile;

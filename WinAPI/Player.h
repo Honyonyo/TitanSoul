@@ -66,6 +66,8 @@ private:
 
 	bool m_sleep;
 
+	float m_deathAlpha;
+
 private:
 	void Move();
 	void Rolling();

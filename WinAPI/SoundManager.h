@@ -39,7 +39,7 @@ enum class SOUNDKIND : UINT8
 };
 
 
-#define EXTRA_SOUND_CHANNEL 5		//여분의 채널 개수
+#define EXTRA_SOUND_CHANNEL 105		//여분의 채널 개수
 #define TOTAL_SOUND_CHANNEL (static_cast<int>(SOUNDKIND::SOUND_END)) + EXTRA_SOUND_CHANNEL		//총 사운드 개수
 
 using namespace FMOD;
@@ -102,7 +102,7 @@ public:
 			sound->channel->setPosition(position, FMOD_TIMEUNIT_MS);
 		}
 	}
-
+	bool GetIsPlayed(string key);
 	unsigned int GetPosition(string key)
 	{
 		unsigned int position = 0;

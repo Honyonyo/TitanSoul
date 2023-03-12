@@ -43,6 +43,9 @@ public:
 	virtual void Update(void) PURE;
 	virtual void Render(void) PURE;
 
+	virtual void SetOn() {};
+	virtual void SetOff() {};
+
 	bool GetIsLoaded(void) { return isLoaded; }
 
 	void LoadTile(vector<tagTile*>* tileLayerVector, string filePath);

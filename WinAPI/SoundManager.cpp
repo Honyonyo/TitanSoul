@@ -141,7 +141,7 @@ void SoundManager::play(string key, float volume)
 	{
 		return;
 	}
-	_system->playSound(FMOD_CHANNEL_FREE, (sc->sound), 0, &(sc->channel));
+	_system->playSound(FMOD_CHANNEL_REUSE, (sc->sound), 0, &(sc->channel));
 	sc->channel->setVolume(volume);
 }
 
@@ -184,6 +184,19 @@ void SoundManager::stop(string key)
 	sc->channel->stop();
 }
 
+bool SoundManager::GetIsPlayed(string key)
+{
+	scGroup* sc = findSound(key);
+	if (sc == nullptr)
+	{
+		return false;
+	}
+
+	bool isPaused;
+	sc->channel->getPaused(&isPaused);
+	return isPaused;
+}
+
 void SoundManager::SoundEffectLoad()
 {
 	const int arrNumCount = 5;
@@ -205,14 +218,11 @@ void SoundManager::SoundEffectLoad()
 			char num = j + 48;
 			string Key = key[i] + num;
 			string Path = path[i] + num + ".mp3";
-			//cout << "key : " << Key << "\t";
-			//cout << "path : " << Path << endl;
-
 			setUp(Key, Path, false, false);
-			play(Key, 1);
 		}
-
 	}
+	setUp("DeathCrush", "Resources/Sound/Player/Crush.ogg", false, false);
+	setUp("DeathImpact", "Resources/Sound/Player/Impact.ogg", false, false);
 
 	//예티 사운드
 	{
@@ -297,7 +307,10 @@ void SoundManager::SoundEffectLoad()
 
 void SoundManager::BGMLoad()
 {
+	setUp("BGMIntro", "Resources/Sound/BGM/Hub1.ogg", true, true);
 	setUp("BGMColosus", "Resources/Sound/BGM/Colossus.mp3", true, true);
+	setUp("BGMYeti", "Resources/Sound/BGM/Yeti.mp3", true, true);
+	setUp("BGMFloor", "Resources/Sound/BGM/Town.ogg", true, true);
 }
 
 SoundManager::SoundManager()

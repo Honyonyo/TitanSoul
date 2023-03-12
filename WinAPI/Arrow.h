@@ -77,10 +77,11 @@ public:
 	}
 
 	//활시위 당기기->화살 쏘기->화살 날아가기
-	//화살 다가오기
+	//활시위 당기기 초기세팅
+	void DrawBowStart(eMoveDirection direction);
 
 	//활시위 당기는 중
-	eMoveDirection DrawBow(eMoveDirection direction);
+	eMoveDirection DrawBow();
 	//활 놓음
 	void ShotArrow();
 	//화살 불러오기
@@ -110,6 +111,7 @@ public:
 	}
 	eMoveDirection DirectionFromRotate()
 	{
+		return m_direction;
 		if (m_rot < 22.5f) return  eRight;
 		else if (m_rot < 67.5f) return  eRightDown;
 		else if (m_rot < 112.5f) return  eDown;

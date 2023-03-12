@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SceneManager.h"
 #include "Scene.h"
-#include "Camera.h"
 
 Scene* SceneManager::_currentScene = nullptr;
 Scene* SceneManager::_loadingScene = nullptr;
@@ -90,13 +89,22 @@ Scene* SceneManager::addLoadingScene(string loadingSceneName, Scene* scene)
 
 HRESULT SceneManager::changeScene(string SceneName, bool startPosSetting, D2D1_POINT_2F startPos)
 {
-    mapSceneIter find = _mSceneList.find(SceneName);
+    mapSceneIter find = _mSceneList.begin();
+    for (; find != _mSceneList.end(); find++)
+    {
+        if (find->first == SceneName)
+            break;
+    }
     
-    if (find->second == _currentScene) return S_OK;
-    if (find == _mSceneList.end()) return E_FAIL;
+    if (find == _mSceneList.end())
+        return E_FAIL;
+    if (find->second == _currentScene) 
+        return S_OK;
 
     if (SUCCEEDED(find->second->Init()))
     {
+        if(_currentScene!=nullptr)
+            _currentScene->SetOff();
         _currentScene = find->second;
         if (startPosSetting)
         {
@@ -106,6 +114,7 @@ HRESULT SceneManager::changeScene(string SceneName, bool startPosSetting, D2D1_P
         {
             PLAYER->SetPosition(_currentScene->GetPlayerStartPos());
         }
+        _currentScene->SetOn();
         _camera->SetMapSize(_currentScene->GetMapWidth(), _currentScene->GetMapHeight());
         cout << "¸Ê ¹Ù²Ù±â. »õ ¸Ê »çÀÌÁî : "<< _currentScene->GetMapWidth() <<", "<< _currentScene->GetMapHeight() <<endl;
         return S_OK;

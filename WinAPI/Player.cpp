@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "Player.h"
-#include "Camera.h"
 #include "Animation.h"
 #include "PixelCollision.h"
 
@@ -38,23 +37,22 @@ void Player::Init()
 void Player::Update()
 {
 	//플레이어 죽으면 동작 안하기
-	if (!m_isAlive && !m_animation->IsPlay()) return;
+	if (!m_isAlive && !m_animation->IsPlay())
+	{
+		m_deathAlpha += 0.5f * DELTA_TIME;
+		if (m_deathAlpha > 1)
+		{
+			m_deathAlpha = 0;
+			m_isAlive = true;
+			m_state = eIdle;
+			m_direction = eDown;
+			SCENEMANAGER->changeScene("Floor");
+		}
+		return;
+	}
 	if (m_sleep)return;
 
 	m_aniChange = false;
-
-	/// X키를 누르고 구르기동작중인 경우에는 구르기는 논캔슬이라 방향전환도 안되고, state변경도 안된다.
-	/// <state변경에관하여>
-	/// 시작시 state를 prevState에 저장한 후 기본인 idle로 바꾸고
-	/// Update에서 무언가 커멘드가 들어갔을 경우 state를 해당 커멘드로 바꾼다.
-	/// prevState와 state가 같으면 같은 동작을 이어서 하는것이므로 direction만 바꾼 후 프레임 유지하고 애니메이션 출력,
-	/// 아닌경우 동작이 아예 바뀐것이므로 direction에 해당하는 새 state애니메이션을 0번째 프레임부터 출력한다.
-	/// </state변경에관하여>
-	/// <direction변경에관하여>
-	/// 화살표키를 누르면 방향이 변하는데,
-	/// C키를 안누르고있으면 걷거나 뛰면서 방향이 전환된다.
-	/// arrow가 있을 경우 C키를 누르고있으면 쏠 방향 각도를 바꾸는 모드로 들어가고, 없으면 끌어당김모드인데 방향전환 불가하다.
-	/// </direction변경에관하여>
 
 	int frameIndex = 0;
 	int prevAniIndex = m_animation->GetNowFrameIdx();
@@ -70,29 +68,37 @@ void Player::Update()
 	//화살 있을때 - 발사모션 / 화살 없을때 - 회수모션
 	if (KEYMANAGER->isStayKeyDown('C'))
 	{
-		m_nonCansleAction = true;
-		CAMERA->SetScaleIncease(true);
-		CAMERA->SetCameraMove({ m_center.x + 40, m_center.y + 40 }, true);
-		if (m_arrow->GetIsShooted())
+		if (m_state != eRolling)
 		{
-			m_state = eCall;
-			if (!m_arrow->GetIsRetrieved())
+			m_nonCansleAction = true;
+			CAMERA->SetScaleIncease(true);
+			//CAMERA->SetCameraMove({ m_center.x + 40, m_center.y + 40 }, true);
+			if (m_arrow->GetIsShooted())
 			{
-				m_arrow->SetSpeed(0);
+				m_state = eCall;
+				if (!m_arrow->GetIsRetrieved())
+				{
+					m_arrow->SetSpeed(0);
+				}
+				m_arrow->Retrieve();
 			}
-			m_arrow->Retrieve();
+			else if (m_arrow->GetIsReady())
+			{
+				m_state = eShotting;
+				if (!m_arrow->GetIsDrawed())
+				{
+					m_arrow->DrawBowStart(m_direction);
+				}
+				else
+				{
+					m_direction = m_arrow->DrawBow();
+				}
+			}
 		}
-		else if (m_arrow->GetIsReady())
-		{
-			m_state = eShotting;
-			m_direction = m_arrow->DrawBow(m_direction);
-		}
-
-	}//end if 'C'		선형보간 - 이동하는 목표점을 향해 가야할 경우 유용(난 필요 없을듯?)
+	}//end if 'C'
 	else if (!m_nonCansleAction)//C안누르거나 구르기상태 아닌 경우에만 MOVE가능
 	{
 		if (m_inGround)
-			//if (m_state != eRolling && m_state != eRollingFail)
 				Move();
 	}//end if not 'C'
 	Rolling();
@@ -169,6 +175,11 @@ void Player::Render()
 
 	IMAGEMANAGER->CenterAniRender(m_Image, m_center.x, m_center.y, m_animation, eLayerPlayer);
 	IMAGEMANAGER->CenterAniRender(m_bowImage, m_center.x, m_center.y, m_animation, eLayerPlayer);
+
+	if (!m_isAlive)
+	{
+		IMAGEMANAGER->DrawBlackRect({ 0,0,WINSIZE_X,WINSIZE_Y }, eLayerTop, m_deathAlpha);
+	}
 };
 void Player::Release()
 {
@@ -184,7 +195,8 @@ void Player::Hit(eObjectKinds kinds)
 	switch (kinds)
 	{
 	case eMonster:
-	//case eMonsterProjectile:
+	case eMonsterProjectile:
+		if (KEYMANAGER->isToggleKey(VK_BACK))return;
 		m_isAlive = false;
 		m_nonCansleAction = true;
 		m_state = eDeath;
@@ -486,7 +498,8 @@ Player::Player() :
 	m_inGround(true),
 	m_sleep(false),
 	m_state(eIdle),
-	m_soundeffectCount(1)
+	m_soundeffectCount(1),
+	m_deathAlpha(0.f)
 {
 	m_direction = eDown;
 };

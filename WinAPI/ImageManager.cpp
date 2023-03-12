@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "ImageManager.h"
-#include "Camera.h"
 #include "Animation.h"
 
 ImageManager::ImageManager()

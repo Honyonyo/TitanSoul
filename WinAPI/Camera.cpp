@@ -1,13 +1,24 @@
 #include "stdafx.h"
 #include "Camera.h"
-Camera::Camera(float scale) :
+void Camera::SetCameraShakingOff()
+{
+	m_shaking = false;
+	m_shakingLeft = false;
+	m_shakingLv = 0;
+	m_shakeChange = 0;
+	m_shakingSpeed = 1.f;
+	m_shakingTime = 0.f;
+	SetCameraMove(PLAYER->GetPointF(), false, false, 1);
+}
+
+Camera::Camera() :
 	m_camRot(0.f),
 	m_scaleIncrease(false), m_moveToRT(false), m_moving(false), m_moveSpeed(0.f),
 	m_shakingLeft(false), m_shaking(false), m_shakingSpeed(1.f), m_shakingLv(0), m_shakeChange(0), m_shakingTime(0.f)
 {
-	m_camScale = scale;
-	m_camWidth = WINSIZE_X / scale;
-	m_camHeight = WINSIZE_Y / scale;
+	m_camScale = IMAGE_SCALE;
+	m_camWidth = WINSIZE_X / IMAGE_SCALE;
+	m_camHeight = WINSIZE_Y / IMAGE_SCALE;
 	m_renderT_2F = { 0.f,0.f };
 	if (PLAYER != nullptr) SetCenter(PLAYER->GetPointF());
 	m_mapWidth = SCENEMANAGER->GetCurrentSceneWidth();

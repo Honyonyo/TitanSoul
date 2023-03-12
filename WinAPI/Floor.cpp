@@ -11,11 +11,14 @@ HRESULT Floor::Init(void)
 		isLoaded = true;
 	}
 
-	m_colossus = new Colossus;
-	OBJECTMANAGER->AddObject(m_colossus);
-	m_colossus->SetFloor();
-	m_colossus->Init();
-	m_yetiGate=RectMakeCenter(800, 1584, 32, 64);
+	if (m_colossus == nullptr)
+	{
+		m_colossus = new Colossus;
+		OBJECTMANAGER->AddObject(m_colossus);
+		m_colossus->SetFloor();
+		m_colossus->Init();
+	}
+	m_yetiGate = RectMakeCenter(800, 1584, 32, 64);
 
     return S_OK;
 }
@@ -65,13 +68,26 @@ void Floor::Render(void)
 	}
 }
 
+void Floor::SetOn()
+{
+	SOUNDMANAGER->play("BGMFloor", 1.f);
+}
+
+void Floor::SetOff()
+{
+	SOUNDMANAGER->stop("BGMFloor");
+	m_colossus->Release();
+	m_colossus->ObjectDelete();
+}
+
 Floor::Floor()
+: m_colossus(nullptr)
 {
 	LoadTile(&m_tileLayerVector, "Floor.json");
 
 	PLAYER->SetSleepOnOff(false);
-	//m_playerStartPos = { 808.0f, 3288.0f };
-	m_playerStartPos = { 800.0f, 1000.0f };
+	m_playerStartPos = { 808.0f, 3288.0f };
+	//m_playerStartPos = { 800.0f, 1000.0f };
 }
 
 Floor::~Floor()

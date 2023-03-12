@@ -65,6 +65,7 @@ class ColossusHand : public Object
 	bool m_down;
 	bool m_comeback;
 
+	bool m_playHitEffectSound;
 public:
 	virtual void Init();
 	virtual void Update();
@@ -87,6 +88,8 @@ public:
 
 		m_isOnAttack = false;
 		m_isOnHit = false;
+		m_playHitEffectSound = false;
+		SOUNDMANAGER->play("RiseBodyLand", 1.f);
 	};
 
 	void HandUp();
@@ -104,7 +107,7 @@ public:
 	{
 		m_imageFrame = frameNumber;
 	};
-
+	void PlaySoundEffect();	
 	ColossusHand(bool leftHand);
 	~ColossusHand();
 };

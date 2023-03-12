@@ -60,7 +60,7 @@ void Snowball::Attack(eObjectKinds kinds)
 	switch (kinds)
 	{
 	case ePlayer:
-		cout << "눈덩이 플레이어 충돌!" << endl;
+		SOUNDMANAGER->play("Yeti_SnowImpact", 1.f);
 		break;
 	case eMonsterProjectile:
 		m_isDelete = true;
@@ -146,7 +146,25 @@ void Icicle::Update()
 			m_attackRange = 4;
 
 			//착지완료하면 공격은 끈다
-			if (m_imageCenter.y = m_center.y)	m_isOnAttack = false;
+			if (m_imageCenter.y = m_center.y)
+			{
+				m_isOnAttack = false;
+				string soundeffectkey = "Yeti_IcicleSmash";
+				int num = RND->getInt(10) + 1;
+				if (num < 10)
+				{
+					soundeffectkey += (char)(num + 48);
+				}
+				else
+				{
+					int tmp = num / 10;
+					num %= 10;
+					soundeffectkey += (char)(tmp + 48);
+					soundeffectkey += (char)(num + 48);
+				}
+				SOUNDMANAGER->play(soundeffectkey, 1.f);
+
+			}
 		}
 
 		//목표지점에서 거리 8미만으로 남았을경우 - 착지한것으로 간주
@@ -266,6 +284,21 @@ void Icicle::Setting(float x, float y, int imgnum)
 
 	m_imageCenter.x = m_center.x;
 	m_imageCenter.y = m_center.y - WINSIZE_Y - RND->getInt(100);
+
+	string soundeffectkey = "Yeti_IcicleLand";
+	int num = RND->getInt(12) + 1;
+	if (num < 10)
+	{
+		soundeffectkey += (char)(num + 48);
+	}
+	else
+	{
+		int tmp = num / 10;
+		num %= 10;
+		soundeffectkey += (char)(tmp + 48);
+		soundeffectkey += (char)(num + 48);
+	}
+	SOUNDMANAGER->play(soundeffectkey, 1.f);
 
 	m_imgNum = imgnum;
 };

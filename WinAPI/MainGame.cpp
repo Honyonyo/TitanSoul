@@ -1,25 +1,19 @@
 #include "stdafx.h"
 #include "MainGame.h"
 #include "SceneManager.h"
-#include "FrostMountains.h"
 #include "YetiScene.h"
 #include "Floor.h"
-#include "ColossusScene.h"
 #include "IntroScene.h"
 
 HRESULT MainGame::Init(void)
 {
 	GameNode::Init(true);
 	//SCENEMANAGER->addScene("IntroScene", new IntroScene);
-	//SCENEMANAGER->addScene("FrostMountain", new FrostMountains);
-	SCENEMANAGER->addScene("Floor", new Floor);
-	//SCENEMANAGER->addScene("ColossusScene", new ColossusScene);
-	//SCENEMANAGER->addScene("YetiScene", new YetiScene);
+	//SCENEMANAGER->addScene("Floor", new Floor);
+	SCENEMANAGER->addScene("YetiScene", new YetiScene);
 	
-	SCENEMANAGER->changeScene("Floor");
-	//SCENEMANAGER->changeScene("YetiScene");
-	//SCENEMANAGER->changeScene("ColossusScene");
 	//SCENEMANAGER->changeScene("IntroScene");
+	SCENEMANAGER->changeScene("YetiScene");
 	OBJECTMANAGER->PlayerInit();
 	
 	return S_OK;

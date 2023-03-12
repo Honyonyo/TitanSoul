@@ -20,6 +20,8 @@ public:
 	virtual void Update(void);
 	virtual void Render(void);
 
+	virtual void SetOn();
+	virtual void SetOff();
 
 	virtual float GetMapWidth()
 	{

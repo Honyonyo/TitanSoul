@@ -135,6 +135,15 @@ void IntroScene::Render(void)
 	}
 }
 
+void IntroScene::SetOn()
+{
+	SOUNDMANAGER->play("BGMIntro", 1.f);
+}
+void IntroScene::SetOff()
+{
+	SOUNDMANAGER->stop("BGMIntro");
+}
+
 void IntroScene::SceneChange(void)
 {
 	PLAYER->SetSleepOnOff(false);

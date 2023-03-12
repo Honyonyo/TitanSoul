@@ -61,16 +61,7 @@ public:
 		m_shakingTime = shakingTime;
 	}
 	//Ä«¸Þ¶ó Èçµé¸² ²ô±â
-	void SetCameraShakingOff()
-	{
-		m_shaking = false; 
-		m_shakingLeft = false;
-		m_shakingLv = 0;
-		m_shakeChange = 0;
-		m_shakingSpeed = 1.f;
-		m_shakingTime = 0.f;
-		SetCameraMove(PLAYER->GetPointF(), false, false, 1);
-	}
+	void SetCameraShakingOff();
 
 	void SetScaleIncease(bool onOff)
 	{
@@ -88,6 +79,6 @@ public:
 	}
 
 #pragma endregion
-	Camera(float scale = IMAGE_SCALE);
+	Camera();
 	~Camera();
 };

@@ -19,9 +19,6 @@
     <Filter Include="API FrameWork\GameCore">
       <UniqueIdentifier>{75617e6e-9aeb-4f50-a4e9-4e578e1f53e1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="MainGame">
-      <UniqueIdentifier>{18ee7c09-1b00-47c3-890a-ada2cf7c7038}</UniqueIdentifier>
-    </Filter>
     <Filter Include="API FrameWork\Manager">
       <UniqueIdentifier>{b6236ff0-ee44-4d31-9a01-4a3d777bbf3c}</UniqueIdentifier>
     </Filter>
@@ -88,9 +85,6 @@
       <Filter>API FrameWork\Utility</Filter>
     </ClCompile>
     <ClCompile Include="WinMain.cpp" />
-    <ClCompile Include="MainGame.cpp">
-      <Filter>MainGame</Filter>
-    </ClCompile>
     <ClCompile Include="Timer.cpp">
       <Filter>API FrameWork\Manager</Filter>
     </ClCompile>
@@ -190,6 +184,7 @@
     <ClCompile Include="BossShield.cpp">
       <Filter>Object\Boss</Filter>
     </ClCompile>
+    <ClCompile Include="MainGame.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="C3DMatrix.h">
@@ -218,9 +213,6 @@
     </ClInclude>
     <ClInclude Include="Utils.h">
       <Filter>API FrameWork\Utility</Filter>
-    </ClInclude>
-    <ClInclude Include="MainGame.h">
-      <Filter>MainGame</Filter>
     </ClInclude>
     <ClInclude Include="resource.h" />
     <ClInclude Include="Timer.h">
@@ -325,6 +317,7 @@
     <ClInclude Include="BossShield.h">
       <Filter>Object\Boss</Filter>
     </ClInclude>
+    <ClInclude Include="MainGame.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WinAPI.rc" />

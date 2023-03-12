@@ -16,14 +16,16 @@ void ObjectManager::Update()
 			iter = m_vObject.erase(iter);
 			continue;
 		}
+
+		(*iter)->Update();
+		
 		if ((*iter)->GetIsDelete())
 		{
 			(*iter)->Release();
 			iter = m_vObject.erase(iter);
 			continue;
 		}
-
-		(*iter)->Update();
+		
 		iter++;
 	}
 	for (auto iter = m_vtmpObject.begin(); iter != m_vtmpObject.end();)
@@ -33,6 +35,9 @@ void ObjectManager::Update()
 			iter = m_vtmpObject.erase(iter);
 			continue;
 		}
+		
+		(*iter)->Update();
+
 		if ((*iter)->GetIsDelete())
 		{
 			(*iter)->Release();
@@ -40,7 +45,6 @@ void ObjectManager::Update()
 			continue;
 		}
 
-		(*iter)->Update();
 		m_vObject.push_back(*iter);
 		iter++;
 	}
