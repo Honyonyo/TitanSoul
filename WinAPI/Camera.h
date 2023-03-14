@@ -3,7 +3,6 @@ static class Camera
 {
 private:
 	float m_camScale;
-	float m_camRot;
 	D2D1_POINT_2F m_centerP_2F;
 	D2D1_POINT_2F m_renderT_2F;
 	float m_camWidth;
@@ -25,8 +24,9 @@ private:
 	float m_shakeChange;
 	float m_shakingTime;
 
+	void SetCameraScale();
 	void SetRenderT();
-	void SetCameraCenter();
+	void SetCameraMoveCenter();
 	void SetShaking();
 
 public:
@@ -55,7 +55,7 @@ public:
 	//		SetCameraShaking(true, 2, 20); 요정도가 요동둉
 	void SetCameraShaking(bool shakingOnOff, float shakingLv, float shakingSpeed = 1.f, float shakingTime = 100.f)
 	{
-		m_shaking = shakingOnOff; 
+		m_shaking = shakingOnOff;
 		m_shakingLv = shakingLv;
 		m_shakingSpeed = shakingSpeed;
 		m_shakingTime = shakingTime;
@@ -69,13 +69,14 @@ public:
 	}
 
 	//카메라 이동 옵션
-	void SetCameraMove(D2D1_POINT_2F renderT, bool move, bool moving = true, float moveSpeed = 1.f)
+	void SetCameraMove
+	(
+		D2D1_POINT_2F renderT, bool move, 
+		bool moving = true, float moveSpeed = 1.f
+	)
 	{
-		//cout << "SetCameraMove! renderT : " << renderT.x << ", " << renderT.y << endl;
-		m_moveTarget = renderT;
-		m_moveToRT = move;
-		m_moving = moving;
-		m_moveSpeed = moveSpeed;
+		m_moveTarget = renderT;	m_moveToRT = move;
+		m_moving = moving;	m_moveSpeed = moveSpeed * 625.f;
 	}
 
 #pragma endregion

@@ -8,11 +8,10 @@ void Camera::SetCameraShakingOff()
 	m_shakeChange = 0;
 	m_shakingSpeed = 1.f;
 	m_shakingTime = 0.f;
-	SetCameraMove(PLAYER->GetPointF(), false, false, 1);
+	SetCameraMove(PLAYER->GetPointF(), false, false);
 }
 
 Camera::Camera() :
-	m_camRot(0.f),
 	m_scaleIncrease(false), m_moveToRT(false), m_moving(false), m_moveSpeed(0.f),
 	m_shakingLeft(false), m_shaking(false), m_shakingSpeed(1.f), m_shakingLv(0), m_shakeChange(0), m_shakingTime(0.f)
 {
@@ -32,13 +31,27 @@ Camera::~Camera()
 
 void Camera::Init()
 {
-	//if (m_mapWidth == NULL)m_mapWidth = SCENEMANAGER->GetCurrentSceneWidth();
-	//if (m_mapHeight == NULL)m_mapHeight = SCENEMANAGER->GetCurrentSceneHeight();
-
 	if (PLAYER != nullptr) SetCenter(PLAYER->GetPointF().x, PLAYER->GetPointF().y);
 }
 
 void Camera::Update()
+{
+	SetCameraScale();
+	SetCameraMoveCenter();
+	SetShaking();
+	SetRenderT();
+}
+
+void Camera::Release()
+{
+
+};
+void Camera::Render()
+{
+
+}
+
+void Camera::SetCameraScale()
 {
 	if (m_scaleIncrease)
 	{
@@ -57,45 +70,31 @@ void Camera::Update()
 			m_camScale = IMAGE_SCALE;
 		}
 	}
-
-	SetCameraCenter();
-	SetShaking();
-	SetRenderT();
 }
-void Camera::Release()
-{
-
-};
-void Camera::Render()
-{
-
-}
-
 
 void Camera::SetRenderT()
 {
 	m_camWidth = WINSIZE_X / m_camScale;
 	m_camHeight = WINSIZE_Y / m_camScale;
 
-	//흔들림, 이동같은 특별한 효과가 있지 않은 경우와 일반적인 경우를 나눠야함
-	//맵 사이즈가 카메라 사이즈보다 작을 경우 , 클경우를 나눠서 해야함
-	//가로 세로 나눠서
-
-		//가로 T위치 잡기
-	if (m_mapWidth < m_camWidth)	//맵사이즈보다 카메라사이즈(화면출력너비)가 넓은 경우
+	//가로 T위치 잡기
+	if (m_mapWidth < m_camWidth)	
+		//맵사이즈보다 카메라사이즈(화면출력너비)가 넓은 경우
 	{
-		m_renderT_2F.x = -(m_camWidth - m_mapWidth) / 2;
+		m_renderT_2F.x = -(m_camWidth - m_mapWidth) / 2 + m_shakeChange;
 	}
 	else//일반적인 경우
 	{
 		m_renderT_2F.x = m_centerP_2F.x - (m_camWidth / 2);
 		//캠이 맵에서 벗어난 경우
 		if (m_renderT_2F.x < 0) m_renderT_2F.x = 0;
-		else if (m_renderT_2F.x + m_camWidth > m_mapWidth) m_renderT_2F.x = m_mapWidth - m_camWidth;
+		else if (m_renderT_2F.x + m_camWidth > m_mapWidth) 
+			m_renderT_2F.x = m_mapWidth - m_camWidth + m_shakeChange;
 	}
 
 	//세로 T위치 잡기
-	if (m_mapHeight < m_camHeight)		//맵 사이즈보다 카메라사이즈(화면출력높이)가 더 긴 경우
+	if (m_mapHeight < m_camHeight)		
+		//맵 사이즈보다 카메라사이즈(화면출력높이)가 더 긴 경우
 	{
 		m_renderT_2F.y = -(m_mapHeight - m_camHeight) / 2;
 	}
@@ -109,7 +108,7 @@ void Camera::SetRenderT()
 	}
 }
 
-void Camera::SetCameraCenter()
+void Camera::SetCameraMoveCenter()
 {
 	if (m_moveToRT)
 	{
@@ -125,9 +124,10 @@ void Camera::SetCameraCenter()
 				}
 				else
 				{
-					float angle = MY_UTIL::getAngle(m_centerP_2F.x, m_centerP_2F.y, m_moveTarget.x, m_moveTarget.y);
-					m_centerP_2F.x += cosf(angle);
-					m_centerP_2F.y -= sinf(angle);
+					float angle = 
+						MY_UTIL::getAngle(m_centerP_2F.x, m_centerP_2F.y, m_moveTarget.x, m_moveTarget.y);
+					m_centerP_2F.x += cosf(angle) * m_moveSpeed*DELTA_TIME;
+					m_centerP_2F.y -= sinf(angle) * m_moveSpeed*DELTA_TIME;
 				}
 			}
 			else m_moving = false;
@@ -164,11 +164,6 @@ void Camera::SetCameraCenter()
 		{
 			SetCenter(PLAYER->GetPointF());
 		}
-	}
-
-	if (KEYMANAGER->isOnceKeyDown('C') || KEYMANAGER->isOnceKeyDown('P'))
-	{
-		printf("카메라좌표 %f, %f\n", m_centerP_2F.x, m_centerP_2F.y);
 	}
 }
 

@@ -605,24 +605,6 @@ void ImageManager::CropRender(CImage* img, float x, float y, RECT cropRc, bool i
 	m_d2dContext->DrawBitmap(img->GetBitMap(), destRect, alpha, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, cropRect);
 };
 
-void ImageManager::SampleRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, float alpha) // Ä«¸Þ¶ó O
-{
-	D2D1_POINT_2U targetPoint = { x,y };
-	D2D1_RECT_F srcRect = { 0,0,500, 1500 };
-	D2D1_MATRIX_3X2_F matT, matR, matS;
-	matT = D2D1::Matrix3x2F::Translation(targetPoint.x + 1000, targetPoint.y + 100);
-	matR = D2D1::Matrix3x2F::Rotation(rot, { (targetPoint.x + 1000.0f) / 2,0 });
-	matS = D2D1::Matrix3x2F::Scale(-sizeX, sizeY);
-	m_d2dContext->SetTransform(matS * matT * matR);
-	//m_mapRenderBitmap->CopyFromBitmap(NULL, img->GetBitMap(), &srcRect);
-	m_d2dContext->DrawBitmap(img->GetBitMap(), D2D1::RectF(x, y, (x - 500), img->GetHeight() + y), alpha, D2D1_BITMAP_INTERPOLATION_MODE_LINEAR, &srcRect);
-	matT = D2D1::Matrix3x2F::Translation(0, 0);
-	matR = D2D1::Matrix3x2F::Rotation(0, { x,y });
-	matS = D2D1::Matrix3x2F::Scale(1, 1);
-	m_d2dContext->SetTransform(matS * matT * matR);
-	ResetTRS();
-}
-
 void ImageManager::CenterUIRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX, float sizeY, float rot, bool isReverse, float alpha)
 {
 	D2D1_MATRIX_3X2_F matT, matR, matS;
@@ -668,15 +650,24 @@ void ImageManager::CenterAniRender(CImage* img, float renderTargetX, float rende
 	D2D1_MATRIX_3X2_F matT, matR, matS;
 	if (isReversed)
 	{
-		matT = D2D1::Matrix3x2F::Translation(((renderTargetX + fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((renderTargetY - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
+		matT = D2D1::Matrix3x2F::Translation
+		(
+			((renderTargetX + fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(),
+			((renderTargetY - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale()
+		);
 		matR = D2D1::Matrix3x2F::Rotation(rot, { fW ,fH });
 		matS = D2D1::Matrix3x2F::Scale(-CAMERA->GetScale(), CAMERA->GetScale()/*, { fW,fH }*/);
 	}
 	else
 	{
-		matT = D2D1::Matrix3x2F::Translation(((renderTargetX - fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), ((renderTargetY - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale());
+		matT = D2D1::Matrix3x2F::Translation
+		(
+			((renderTargetX - fW) - CAMERA->GetRenderTargetX()) * CAMERA->GetScale(), 
+			((renderTargetY - fH) - CAMERA->GetRenderTargetY()) * CAMERA->GetScale()
+		);
 		matR = D2D1::Matrix3x2F::Rotation(rot, { 0 ,0 });
-		matS = D2D1::Matrix3x2F::Scale(CAMERA->GetScale(), CAMERA->GetScale()/*, { fW,fH }*/);
+		matS = D2D1::Matrix3x2F::Scale(CAMERA->GetScale(), CAMERA->GetScale()
+		);
 	}
 	m_d2dContext->SetTransform((matS * matR * matT));
 	HRESULT hr = S_OK;

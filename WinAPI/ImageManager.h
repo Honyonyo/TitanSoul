@@ -111,7 +111,6 @@ public:
 
 	void Render(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void CropRender(CImage* img, float x, float y, RECT cropRc, bool isReversed = false, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
-	void SampleRender(CImage* img, float x, float y, float sizeX = 1, float sizeY = 1, float rot = 0, float alpha = 1);
 	void CenterUIRender(CImage* img, float x, float y, int frame=0, int frameY=0, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
 	void CenterAniRender(CImage* img, float renderTargetX, float renderTargetY, Animation* ani, eLayer layer, bool isReversed = false,  float rot = 0, float alpha = 1);
 	void FrameRender(CImage* img, float x, float y, int frameX, int frameY, float sizeX = 1, float sizeY = 1, float rot = 0, bool isReverse = false, float alpha = 1);
@@ -148,15 +147,6 @@ public:
 	void DrawRectCenter(RECT rt, CImage* img);
 	void DrawColorRender(CImage* img, float x, float y, float sizeX, float sizeY, float rot, bool isReverse, D2D1_COLOR_F colr);
 
-	void ResetTRS()
-	{
-		D2D1_MATRIX_3X2_F matT;
-		matT = D2D1::Matrix3x2F::Translation(100, 100);
-
-		m_trsDefault.dx = 0;
-		m_trsDefault.dy = 0;
-		m_d2dContext->SetTransform(m_trsDefault);
-	}
 	void Begin();
 	void End()
 	{
