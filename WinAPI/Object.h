@@ -31,7 +31,7 @@ public:
 	virtual void Release() PURE;
 
 	virtual void Attack(eObjectKinds kinds) PURE;
-	virtual void Hit(eObjectKinds kinds) PURE;	//날 때린놈의 종류에 따라서 다른 반응 보여주기
+	virtual void Hit(eObjectKinds kinds) PURE;
 
 #pragma region 접근자 지정자
 	eObjectKinds GetKinds() { return m_kinds; }

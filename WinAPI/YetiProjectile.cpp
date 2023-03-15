@@ -49,7 +49,12 @@ void Snowball::SetRender()
 
 void Snowball::SetMove(D2D1_POINT_2F playerPoint)
 {
-	m_angle = MY_UTIL::getAngle(m_center.x, m_center.y, playerPoint.x, playerPoint.y);
+	m_angle = 
+		MY_UTIL::getAngle
+		(
+			m_center.x, m_center.y, 
+			playerPoint.x, playerPoint.y
+		);
 	m_isOnAttack = true;
 	m_isOnHit = true;
 	m_move = true;
@@ -97,7 +102,6 @@ Snowball::Snowball(float centerX, float centerY)
 void Icicle::Init()
 {
 	/// 고드름 떨어지는 속도 8정도..
-	/// 
 	m_img = IMAGEMANAGER->FindImage("YetiProjectile");
 	m_shadowScale = 0.01;
 }

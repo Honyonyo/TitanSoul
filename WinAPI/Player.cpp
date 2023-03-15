@@ -72,7 +72,6 @@ void Player::Update()
 		{
 			m_nonCansleAction = true;
 			CAMERA->SetScaleIncease(true);
-			//CAMERA->SetCameraMove({ m_center.x + 40, m_center.y + 40 }, true);
 			if (m_arrow->GetIsShooted())
 			{
 				m_state = eCall;
@@ -92,6 +91,7 @@ void Player::Update()
 				else
 				{
 					m_direction = m_arrow->DrawBow();
+					
 				}
 			}
 		}
@@ -219,11 +219,6 @@ void Player::Move()
 
 	m_directionKey.reset();
 
-	/// <summary>
-	/// 화살표 키를 눌렀을 때 : 방향전환
-	/// 뗐을 때 : 다른 키를 누르고있다면 : 방향전환 ->어떻게 판별? state가 idle이 아닌 경우로 판별하기
-	/// 뗐을 때 : 다른 키를 누르는게 없다면 : 키 떼기 직전 방향을 바라보고 멈추기 ->state가 idle인 경우
-	/// </summary>
 	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
 	{
 		if (!m_pixelCollision->GetLeftColl()) m_center.x -= speed;

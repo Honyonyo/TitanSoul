@@ -52,7 +52,6 @@ class ColossusHand : public Object
 	CImage* m_shadow;
 	int m_imageFrame;
 
-	//들어올리기와 찍기가 각각 1초씩 들어감
 	D2D1_POINT_2F m_colossusCenter;
 	D2D1_POINT_2F m_moveStartP;
 
@@ -75,6 +74,23 @@ public:
 	virtual void Attack(eObjectKinds kinds);
 	virtual void Hit(eObjectKinds kinds);
 	
+	void SetStart()
+	{
+		m_isOnAttack = false;
+		m_isOnHit = true;
+
+		m_attack = false;
+		m_up = false;
+		m_down = false;
+		m_comeback = false;
+		m_playHitEffectSound = false;
+
+		m_center.x = m_leftHand ? 760 : 856;
+		m_center.y = 968;
+		m_hitboxCenter = m_attackCenter = m_center;
+		m_hitboxRange = 16;
+		m_attackRange = 4;
+	}
 	void AttackStart()
 	{
 		m_moveStartP = m_center;

@@ -28,6 +28,13 @@ void Colossus::Init()
 
 void Colossus::Update()
 {
+	if (KEYMANAGER->isOnceKeyDown('R')) 
+	{
+		m_isAlive = true; m_wakeup = false;
+		m_handL->SetStart();
+		m_handR->SetStart();
+	}
+
 	if (m_isAlive)
 	{
 		if (KEYMANAGER->isOnceKeyDown('M'))
@@ -298,9 +305,17 @@ void ColossusHand::HandUp()
 {
 	if (m_actionTime != 0)
 	{
-		float moveDistance = sqrtf(m_actionTime)
-			* MY_UTIL::getDistance(m_moveStartP.x, m_moveStartP.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80) / sqrtf(1.50f);
-		float angle = MY_UTIL::getAngle(m_moveStartP.x, m_moveStartP.y, PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80);
+		float moveDistance = sqrtf(m_actionTime) * 
+			MY_UTIL::getDistance
+			(
+				m_moveStartP.x, m_moveStartP.y, 
+				PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80
+			) / sqrtf(1.50f);
+		float angle = MY_UTIL::getAngle
+		(
+			m_moveStartP.x, m_moveStartP.y, 
+			PLAYER->GetPointF().x, PLAYER->GetPointF().y - 80
+		);
 		m_hitboxCenter.x = m_moveStartP.x + cosf(angle) * moveDistance;
 		m_hitboxCenter.y = m_moveStartP.y - sinf(angle) * moveDistance;
 		m_attackCenter.x = m_hitboxCenter.x;
@@ -334,7 +349,6 @@ void ColossusHand::HandDown()
 	else if (m_actionTime > 0.5f&& m_actionTime<1.f)
 	{
 		m_hitboxCenter.y = m_attackCenter.y - 80.f + 160.f * m_actionTime;
-		//0.8
 		if (m_hitboxCenter.y >= m_attackCenter.y)
 		{
 			m_hitboxCenter.y = m_attackCenter.y;
@@ -409,15 +423,7 @@ ColossusHand::ColossusHand(bool leftHand)
 {
 	m_kinds = eMonsterProjectile;
 	m_colossusCenter = { (leftHand ? 800.f : 816.f), 920.f + 16 };
-
-	m_isOnAttack = false;
-	m_isOnHit = true;
-
-	m_center.x = leftHand ? 760 : 856;
-	m_center.y = 968;
-	m_hitboxCenter = m_attackCenter = m_center;
-	m_hitboxRange = 16;
-	m_attackRange = 4;
+	SetStart();
 }
 
 ColossusHand::~ColossusHand()

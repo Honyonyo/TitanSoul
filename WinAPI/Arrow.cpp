@@ -30,7 +30,7 @@ void Arrow::Update()
 		Move();
 		m_pixelCollision->Update();
 	}
-	if (m_speed > 0.5)	//##다시정하기
+	if (m_speed > 0.3)
 	{
 		m_isOnAttack = true;
 	}
@@ -42,7 +42,7 @@ void Arrow::Update()
 	{
 		if (m_direction == eUp)
 		{
-			if (MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y-4, m_playerCenter->x, m_playerCenter->y) < 3)
+			if (MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y - 4, m_playerCenter->x, m_playerCenter->y) < 3)
 			{
 				cout << MY_UTIL::getDistance(m_attackCenter.x, m_attackCenter.y, m_playerCenter->x, m_playerCenter->y) << endl;
 				PickArrow();
@@ -189,17 +189,17 @@ void Arrow::PickArrow()
 bool Arrow::RotateChangeOnDrawBow()
 {
 	bool changed = false;
-	//좌우키 눌렀을 때 (기준은 180도 이하일 때 왼쪽키 = 각 더하기 / 아닐때 각 빼기)
+	float changeRot = 3 * DELTA_TIME;
 	if (KEYMANAGER->isStayKeyDown(VK_LEFT))
 	{
 		if (m_rot < 180.f)
 		{
-			m_rot += 45.f * DELTA_TIME;
+			m_rot += 45.f * changeRot;
 			if (m_rot >= 180.f) m_rot = 180.f;
 		}
 		else
 		{
-			m_rot -= 45 * DELTA_TIME;
+			m_rot -= 45 * changeRot;
 			if (m_rot < 0) m_rot = 0.f;
 		}
 		changed = true;
@@ -208,13 +208,13 @@ bool Arrow::RotateChangeOnDrawBow()
 	{
 		if (m_rot < 180.f)
 		{
-			m_rot -= 45.f * DELTA_TIME;
+			m_rot -= 45.f * changeRot;
 			if (m_rot < 0) m_rot = 0.f;
 		}
 		else
 		{
-			m_rot += 45.f * DELTA_TIME;
-			if (m_rot >=360.f) m_rot = 0.f;
+			m_rot += 45.f * changeRot;
+			if (m_rot >= 360.f) m_rot = 0.f;
 		}
 		changed = true;
 	}
@@ -223,14 +223,14 @@ bool Arrow::RotateChangeOnDrawBow()
 	{
 		if (m_rot > 90.f && m_rot <= 270.f)
 		{
-			m_rot += 45.f * DELTA_TIME;
+			m_rot += 45.f * changeRot;
 			if (m_rot > 270.f) m_rot = 270.f;
 		}
 		else
 		{
-			m_rot -= 45.f * DELTA_TIME;
-			if (m_rot < 90.f) m_rot = 90.f;
-			else if (m_rot < 0.f) m_rot += 360;
+			m_rot -= 45.f * changeRot;
+			if (m_rot < 0.f) m_rot += 360;
+			else if (m_rot < 270.f) m_rot = 270.f;
 		}
 		changed = true;
 	}
@@ -238,12 +238,12 @@ bool Arrow::RotateChangeOnDrawBow()
 	{
 		if (m_rot >= 90.f && m_rot <= 270.f)
 		{
-			m_rot -= 45.f * DELTA_TIME;
+			m_rot -= 45.f * changeRot;
 			if (m_rot < 90.f) m_rot = 90.f;
 		}
 		else
 		{
-			m_rot += 45.f * DELTA_TIME;
+			m_rot += 45.f * changeRot;
 			if (m_rot >= 360) m_rot = 0.f;
 			else if (m_rot > 90.f) m_rot = 90.f;
 		}

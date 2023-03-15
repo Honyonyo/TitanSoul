@@ -122,7 +122,7 @@ public:
 
 	void SetAnimationFrame();
 	void SetDirection();
-	void SetStart();
+	void SetStart(bool lifeReset = false);
 
 	Yeti();
 	~Yeti();

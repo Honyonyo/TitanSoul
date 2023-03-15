@@ -86,8 +86,8 @@ Floor::Floor()
 	LoadTile(&m_tileLayerVector, "Floor.json");
 
 	PLAYER->SetSleepOnOff(false);
-	m_playerStartPos = { 808.0f, 3288.0f };
-	//m_playerStartPos = { 800.0f, 1000.0f };
+	//m_playerStartPos = { 808.0f, 3288.0f };
+	m_playerStartPos = { 800.0f, 1000.0f };
 }
 
 Floor::~Floor()

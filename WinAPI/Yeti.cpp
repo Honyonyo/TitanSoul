@@ -49,6 +49,7 @@ void Yeti::Init()
 
 void Yeti::Update()
 {
+	if (KEYMANAGER->isOnceKeyDown('R')) SetStart(true);
 	eAction prevAction = m_action;
 	eMoveDirection prevDirection = m_direction;
 	int prevFrame = m_animation->GetNowFrameIdx();
@@ -209,19 +210,18 @@ void Yeti::Hit(eObjectKinds kinds)
 
 void Yeti::SetPattern()
 {
-	int a = RND->getInt(3);
 	//int a = 2;
+	int a = RND->getInt(3);
 	switch (a)
 	{
 	case 0:
-		if (m_action == eThrow) { m_pattern.push(eReady); }
 		m_pattern.push(eThrow);
 		m_pattern.push(eThrow);
 		m_pattern.push(eThrow);
 		m_pattern.push(eThrow);
+		m_pattern.push(eReady);
 		break;
 	case 1:
-		if (m_action == eRolling) { m_pattern.push(eReady); }
 		a = RND->getInt(10);
 		if (a < 1) a = 1;
 		else if (a < 3) a = 2;
@@ -231,6 +231,7 @@ void Yeti::SetPattern()
 		{
 			m_pattern.push(eRolling);
 		}
+		m_pattern.push(eReady);
 		break;
 	case 2:
 		m_pattern.push(eReady);
@@ -393,15 +394,13 @@ void Yeti::Rolling()
 		if (m_hitWall)	//구르기 점프식
 		{
 
-			m_center.x += m_rollingJumpMoveX * DELTA_TIME;
-			m_center.y += (m_rollingJumpMoveY - m_rollingJumpSpeed) * DELTA_TIME;
-			m_rollingJumpSpeed -= m_rollingGravity * DELTA_TIME;
+			m_center.x += 
+				m_rollingJumpMoveX * DELTA_TIME;
+			m_center.y += 
+				(m_rollingJumpMoveY - m_rollingJumpSpeed) * DELTA_TIME;
+			m_rollingJumpSpeed -= 
+				m_rollingGravity * DELTA_TIME;
 
-			//(점프로 구현하면 되겠다)
-			//center점이 착지목표점까지의 직선을 기준으로 점프로 떠있음
-			//if (m_center.x - m_rollingDest.x < 5 && m_center.x - m_rollingDest.x>5)
-
-				//center점이 착지 목표점에 도착하면 m_hitWall을 끄고 Rolling마지막 프레임으로 돌린다. + 타격on, hitWall false
 			if (m_rollingJumpSpeed < 0)
 			{
 				if (MY_UTIL::getDistance(m_center.x, m_center.y, m_rollingDest.x, m_rollingDest.y) < 3)
@@ -420,7 +419,7 @@ void Yeti::Rolling()
 				}
 			}
 			m_shadowCenter.x += m_rollingJumpMoveX * DELTA_TIME;
-			m_shadowCenter.y += m_rollingJumpMoveY * DELTA_TIME;
+			m_shadowCenter.y -= m_rollingJumpMoveY * DELTA_TIME;
 		}
 		else//일반적인 구르기
 		{
@@ -701,8 +700,9 @@ void Yeti::SetDirection()
 	else m_direction = eRight;
 };
 
-void Yeti::SetStart()
+void Yeti::SetStart(bool lifeReset)
 {
+	if (lifeReset) m_isAlive = true;
 	if (m_isAlive)
 	{
 		m_center = { 496,480 };

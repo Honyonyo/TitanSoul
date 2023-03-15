@@ -7,15 +7,6 @@ class PixelCollision;
 
 class Player : public Object
 {
-	/*
-		eObjectKinds m_kinds;
-		D2D1_POINT_2F m_center;	//오브젝트 중심점
-		float m_hitboxRange;	//피격 범위
-		float m_attackRange;	//공격범위
-
-		bool m_isOnHit;
-		bool m_isOnAttack;
-	*/
 	enum eState
 	{
 		eIdle = 0,

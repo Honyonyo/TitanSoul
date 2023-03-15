@@ -9,11 +9,12 @@ HRESULT MainGame::Init(void)
 {
 	GameNode::Init(true);
 	//SCENEMANAGER->addScene("IntroScene", new IntroScene);
-	//SCENEMANAGER->addScene("Floor", new Floor);
-	SCENEMANAGER->addScene("YetiScene", new YetiScene);
+	SCENEMANAGER->addScene("Floor", new Floor);
+	//SCENEMANAGER->addScene("YetiScene", new YetiScene);
 	
 	//SCENEMANAGER->changeScene("IntroScene");
-	SCENEMANAGER->changeScene("YetiScene");
+	//SCENEMANAGER->changeScene("YetiScene");
+	SCENEMANAGER->changeScene("Floor");
 	OBJECTMANAGER->PlayerInit();
 	
 	return S_OK;

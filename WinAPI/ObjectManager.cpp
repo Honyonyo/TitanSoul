@@ -18,14 +18,14 @@ void ObjectManager::Update()
 		}
 
 		(*iter)->Update();
-		
+
 		if ((*iter)->GetIsDelete())
 		{
 			(*iter)->Release();
 			iter = m_vObject.erase(iter);
 			continue;
 		}
-		
+
 		iter++;
 	}
 	for (auto iter = m_vtmpObject.begin(); iter != m_vtmpObject.end();)
@@ -35,7 +35,7 @@ void ObjectManager::Update()
 			iter = m_vtmpObject.erase(iter);
 			continue;
 		}
-		
+
 		(*iter)->Update();
 
 		if ((*iter)->GetIsDelete())
@@ -58,7 +58,7 @@ void ObjectManager::Update()
 	{
 		for (auto hit = m_vObject.begin(); hit != m_vObject.end(); hit++)
 		{
-			if (attack == hit) 
+			if (attack == hit)
 				continue;
 			if (!(*attack)->GetIsOnAttack())
 				continue;
@@ -66,10 +66,17 @@ void ObjectManager::Update()
 				continue;
 
 			//공격점과 피격점의 거리가 공격범위+피격범위일 경우 공격자의 Attack함수와 피격자의 Hit함수를 실행시킨다.
-			else if (
-				MY_UTIL::getDistance((*attack)->GetAttackCenter().x, (*attack)->GetAttackCenter().y, (*hit)->GetHitboxCenter().x, (*hit)->GetHitboxCenter().y)
-				<
-				(*attack)->GetAttackRange() + (*hit)->GetHitboxRange()
+			else if
+				(
+					MY_UTIL::getDistance
+					(
+						(*attack)->GetAttackCenter().x, (*attack)->GetAttackCenter().y,
+						(*hit)->GetHitboxCenter().x, (*hit)->GetHitboxCenter().y
+					)
+
+					<
+
+					(*attack)->GetAttackRange() + (*hit)->GetHitboxRange()
 				)
 			{
 				(*attack)->Attack((*hit)->GetKinds());
