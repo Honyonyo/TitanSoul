@@ -126,14 +126,14 @@ void Arrow::ShotArrow()
 	m_isShotted = true;
 	m_isReady = false;
 
-	if (m_drawTime < 0.2f)
+	if (m_drawTime < 0.1f)
 	{
 		m_isShotted = false;
 		m_speed = 0;
 	}
 	else
 	{
-		m_speed = round(m_drawTime * 100) * 0.1f;
+		m_speed = round(m_drawTime * 200) * 0.1f;
 		if (m_speed > 20) m_speed = 20;
 		m_center.x += 6 * cosf(m_rotRadian);
 		m_center.y -= 6 * sinf(m_rotRadian);

@@ -59,6 +59,7 @@ void Yeti::Update()
 	SetCollUpdate(prevFrame);
 	if (m_action == eDeath && !m_animation->IsPlay()) return;
 
+	if (KEYMANAGER->isOnceKeyDown('U')) m_direction = eUp;
 	if (KEYMANAGER->isToggleKey('M')) return;
 
 	//자고있지 않을 때
@@ -476,8 +477,8 @@ void Yeti::Ready(int prevFrame)
 {
 	if (prevFrame != m_animation->GetNowFrameIdx())
 	{
-		if(m_animation->GetNowFrameIdx() == 2)
-			SetDirection();
+	//	if(m_animation->GetNowFrameIdx() == 2)
+	//		SetDirection();
 	}
 };
 
